@@ -1,12 +1,18 @@
 # Benchmark
 
-A simple benchmarking tool for Sia. Starts up a small local testnet with 50 storage providers and uploads and downloads 1GiB of data. The upload benchmark measures the time it takes to encrypt, erasure-code, and upload the data using the default 10-of-30 params. The download benchmark measures the time it takes to download, erasure-code, and decrypt the data.
+A simple benchmarking tool to generate easy to reproduce benchmarks for the Sia ecosystem. Each benchmark gets a distinct testnet using [cluster](https://github.com/SiaFoundation/cluster). The benchmarks are designed to be run on a machine with a large number of cores to support the number of concurrent processes.
 
 We will add additional benchmarks specifically for single host/renter interactions using RHP3 as a baseline for testing regressions.
 
-The goal of this repository is to publish easy to reproduce end-to-end benchmarks for Sia in ideal conditions. As such, it should be run on a machine with a recent CPU with plenty of cores to support the number of concurrent processes.
+The results published in this repository and the code to reproduce the benchmarks are under the MIT license.
 
-Both the data in this repository and the code to run the benchmarks are licensed under the MIT license.
+## Benchmarks
+
+### End-to-End
+
+The end-to-end benchmark is designed to test the performance of a renterd node. It forms contracts with a number of hosts and tests the speed of encrypting, erasur-coding, uploading shards, downloading, and reconstruction in ideal production-like conditions.
+
+[Results](results/e2e.csv)
 
 ## Usage
 
