@@ -33,6 +33,8 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           delete-branch: true
+          commit-message: Add benchmark results
+          title: Add benchmark results
           labels: |
             benchmark
           add-paths: |
