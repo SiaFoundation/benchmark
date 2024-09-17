@@ -36,6 +36,7 @@ jobs:
           delete-branch: true
           commit-message: Add benchmark results
           title: Add benchmark results
+          branch: benchmark-result
           labels: |
             benchmark
           add-paths: |
