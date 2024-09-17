@@ -57,6 +57,10 @@ func main() {
 	flag.IntVar(&hostdCount, "hosts", 50, "number of hosts to connect to")
 	flag.Parse()
 
+	if err := os.MkdirAll(outputPath, 0755); err != nil {
+		panic(err)
+	}
+
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
 		fmt.Println("Could not read build info")
@@ -247,7 +251,7 @@ func main() {
 		}
 	}
 
-	if err := runE2EBenchmark(ctx, hostdVersion, renterdVersion, "e2e.csv", renter, log); err != nil {
+	if err := runE2EBenchmark(ctx, hostdVersion, renterdVersion, filepath.Join(outputPath, "e2e.csv"), renter, log); err != nil {
 		log.Panic("failed to run e2e benchmark", zap.Error(err))
 	}
 }
