@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
   
 jobs:
   benchmark:
@@ -22,12 +26,15 @@ jobs:
 
           mkdir -p results
           CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
+          git reset --hard 
       - name: Run
         run: ./bin/benchmark -hosts 50 -output results
       - name: Add Result
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: benchmark-results
+          delete-branch: true
+          labels: |
+            benchmark
           add-paths: |
             results/*.csv
         
