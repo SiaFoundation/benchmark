@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -313,7 +314,7 @@ func writeResult(outputPath string, results BenchmarkResult) error {
 	enc := csv.NewWriter(f)
 
 	if writeHeader {
-		row := []string{"Timestamp", "CPU", "hostd version", "renterd version", "upload speed", "download speed"}
+		row := []string{"Timestamp", "OS", "Arch", "CPU", "hostd version", "renterd version", "upload speed", "download speed"}
 		if err := enc.Write(row); err != nil {
 			return fmt.Errorf("failed to write header: %w", err)
 		}
@@ -321,6 +322,8 @@ func writeResult(outputPath string, results BenchmarkResult) error {
 
 	row := []string{
 		time.Now().Format(time.RFC3339),
+		runtime.GOOS,
+		runtime.GOARCH,
 		results.CPU,
 		results.HostdCommit,
 		results.RenterdCommit,
