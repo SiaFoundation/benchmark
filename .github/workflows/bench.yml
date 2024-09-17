@@ -1,4 +1,4 @@
-name: Bench
+name: Benchmark
 
 on:
   workflow_dispatch:
@@ -14,17 +14,17 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Prepare Benchmark
-        run:
+      - name: Prepare
+        run: |
           go get go.sia.tech/hostd@master
           go get go.sia.tech/renterd@dev
           go mod tidy
 
           mkdir -p results
           CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
-      - name: Run Benchmark
+      - name: Run
         run: ./bin/benchmark -hosts 50 -output results
-      - name: PR Result
+      - name: Add Result
         uses: peter-evans/create-pull-request@v7
         with:
           branch: benchmark-results
