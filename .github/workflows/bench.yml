@@ -42,6 +42,8 @@ jobs:
             results/*.csv
       - name: Automerge
         run: gh pr merge --merge --auto "${{ steps.result.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           
         
