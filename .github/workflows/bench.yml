@@ -1,0 +1,35 @@
+name: Bench
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+  
+jobs:
+  benchmark:
+    runs-on: linux-benchmark
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Prepare Benchmark
+        run:
+          go get go.sia.tech/hostd@master
+          go get go.sia.tech/renterd@dev
+          go mod tidy
+
+          mkdir -p results
+          CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
+      - name: Run Benchmark
+        run: ./bin/benchmark -hosts 50 -output results
+      - name: PR Result
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: benchmark-results
+          add-paths: |
+            results/*.csv
+        
+          
+      
