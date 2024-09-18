@@ -52,7 +52,7 @@ func main() {
 		hostdCount   int
 	)
 
-	flag.StringVar(&outputPath, "output", "", "output directory for benchmark results")
+	flag.StringVar(&outputPath, "output", "results", "output directory for benchmark results")
 	flag.StringVar(&dir, "dir", "", "directory to store node data")
 	flag.StringVar(&logLevel, "log", "info", "logging level")
 	flag.IntVar(&hostdCount, "hosts", 50, "number of hosts to connect to")
@@ -258,35 +258,61 @@ func main() {
 }
 
 func runE2EBenchmark(ctx context.Context, hostVersion, renterVersion, outputPath string, renter nodes.Node, log *zap.Logger) error {
-	oneGiB := frand.Bytes(1 << 30)
+	const (
+		benchmarkSize = (1 << 30) / 4
+		iterations    = 4
+	)
+
 	worker := worker.NewClient(renter.APIAddress+"/api/worker", renter.Password)
 
-	log.Info("starting upload")
-	uploadStart := time.Now()
-	_, err := worker.UploadObject(ctx, bytes.NewReader(oneGiB), "default", "1gib.test", rapi.UploadObjectOptions{
-		MinShards:   10,
-		TotalShards: 30,
-	})
-	uploadDuration := time.Since(uploadStart)
-	if err != nil {
-		log.Panic("failed to upload object", zap.Error(err))
-	}
-	log.Info("uploaded 1 GiB object", zap.Duration("duration", uploadDuration))
+	uploadTimes := make([]time.Duration, 0, iterations)
+	for i := range iterations {
+		data := frand.Bytes(benchmarkSize)
 
-	log.Info("starting download")
-	downloadStart := time.Now()
-	err = worker.DownloadObject(ctx, io.Discard, "default", "1gib.test", rapi.DownloadObjectOptions{})
-	downloadDuration := time.Since(downloadStart)
-	if err != nil {
-		log.Panic("failed to download object", zap.Error(err))
+		log.Info("starting upload")
+		uploadStart := time.Now()
+		_, err := worker.UploadObject(ctx, bytes.NewReader(data), "default", fmt.Sprintf("benchmark-%d", i+1), rapi.UploadObjectOptions{
+			MinShards:   10,
+			TotalShards: 30,
+		})
+		uploadDuration := time.Since(uploadStart)
+		if err != nil {
+			log.Panic("failed to upload object", zap.Error(err))
+		}
+		uploadTimes = append(uploadTimes, uploadDuration)
+		log.Info("uploaded 1 GiB object", zap.Duration("duration", uploadDuration))
 	}
-	log.Info("downloaded 1 GiB object", zap.Duration("duration", downloadDuration))
+
+	downloadTimes := make([]time.Duration, 0, iterations)
+	for i := range iterations {
+		log.Info("starting download")
+		downloadStart := time.Now()
+		err := worker.DownloadObject(ctx, io.Discard, "default", fmt.Sprintf("benchmark-%d", i+1), rapi.DownloadObjectOptions{})
+		downloadDuration := time.Since(downloadStart)
+		if err != nil {
+			log.Panic("failed to download object", zap.Error(err))
+		}
+		downloadTimes = append(downloadTimes, downloadDuration)
+		log.Info("downloaded 1 GiB object", zap.Duration("duration", downloadDuration))
+	}
+
+	var uploadTime time.Duration
+	for _, t := range uploadTimes {
+		uploadTime += t
+	}
+	uploadDuration := uploadTime / time.Duration(iterations)
+
+	var downloadTime time.Duration
+	for _, t := range downloadTimes {
+		downloadTime += t
+	}
+	downloadDuration := downloadTime / time.Duration(iterations)
 
 	result := BenchmarkResult{
 		CPU:           cpuid.CPU.BrandName,
 		HostdCommit:   hostVersion,
 		RenterdCommit: renterVersion,
-		ObjectSize:    uint64(len(oneGiB)),
+		ObjectSize:    benchmarkSize,
 		UploadTime:    uploadDuration,
 		DownloadTime:  downloadDuration,
 	}
