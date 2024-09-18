@@ -10,9 +10,9 @@ The results published in this repository and the code to reproduce the benchmark
 
 ### End-to-End
 
-The end-to-end benchmark is designed to test the performance of a renterd node. It forms contracts with a number of hosts and tests the speed of encrypting, erasure-coding, uploading shards, downloading, and reconstruction in ideal production-like conditions. The benchmark performs four iterations using 256MiB test files and reports the average of the four iterations. 
+The end-to-end benchmark is designed to test the performance of a renterd node. It forms contracts with a number of hosts and tests the speed of encrypting, erasure-coding, uploading shards, downloading, and reconstruction in ideal production-like conditions. The benchmark performs four iterations using 160MiB test files and reports the average of the four iterations. 
 
-*While the test data is 256MiB, the actual data uploaded to hosts is 768MiB due to erasure-coding overhead. It would therefore be technically accurate to multiply the upload data size by three, but the benchmark calculates the speed based on the file size a user uploads, not the additional data sent to hosts.*
+*While the test data is 160MiB, the actual data uploaded to hosts is 480MiB due to 10-of-30 erasure-coding overhead. It would therefore be technically accurate to multiply the upload data size by three. However, the desire is to show the speed based on the file size a user uploads, not the redundant shards sent to hosts.*
 
 [Results](results/e2e.csv)
 

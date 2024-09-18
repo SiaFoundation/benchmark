@@ -19,6 +19,7 @@ import (
 	"github.com/klauspost/cpuid/v2"
 	"go.sia.tech/cluster/nodes"
 	"go.sia.tech/core/gateway"
+	rhp2 "go.sia.tech/core/rhp/v2"
 	"go.sia.tech/core/types"
 	"go.sia.tech/coreutils"
 	"go.sia.tech/coreutils/chain"
@@ -259,8 +260,9 @@ func main() {
 
 func runE2EBenchmark(ctx context.Context, hostVersion, renterVersion, outputPath string, renter nodes.Node, log *zap.Logger) error {
 	const (
-		benchmarkSize = (1 << 30) / 4
-		iterations    = 4
+		benchmarkSectors = 40
+		iterations       = 4
+		benchmarkSize    = benchmarkSectors * rhp2.SectorSize
 	)
 
 	worker := worker.NewClient(renter.APIAddress+"/api/worker", renter.Password)
