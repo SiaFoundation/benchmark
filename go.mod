@@ -7,7 +7,7 @@ require (
 	go.sia.tech/cluster v0.0.0-20240916234506-05e4db2538f0
 	go.sia.tech/core v0.4.6
 	go.sia.tech/coreutils v0.3.2
-	go.sia.tech/renterd v1.0.8-0.20240917130351-e7ad132b9077
+	go.sia.tech/renterd v1.1.0-beta.4
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.4.2
 )
