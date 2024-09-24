@@ -6,7 +6,6 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"os/signal"
@@ -34,13 +33,14 @@ import (
 	"lukechampine.com/frand"
 )
 
-type BenchmarkResult struct {
+type E2EBenchmarkResult struct {
 	CPU           string        `json:"cpu"`
 	HostdCommit   string        `json:"hostdCommit"`
 	RenterdCommit string        `json:"renterdCommit"`
 	ObjectSize    uint64        `json:"objectSize"`
 	UploadTime    time.Duration `json:"uploadTime"`
 	DownloadTime  time.Duration `json:"downloadTime"`
+	TTFB          time.Duration `json:"ttfb"`
 }
 
 func main() {
@@ -260,72 +260,52 @@ func main() {
 
 func runE2EBenchmark(ctx context.Context, hostVersion, renterVersion, outputPath string, renter nodes.Node, log *zap.Logger) error {
 	const (
-		benchmarkSectors = 40
-		iterations       = 4
+		benchmarkSectors = 80
 		benchmarkSize    = benchmarkSectors * rhp2.SectorSize
 	)
 
 	worker := worker.NewClient(renter.APIAddress+"/api/worker", renter.Password)
 
-	uploadTimes := make([]time.Duration, 0, iterations)
-	for i := range iterations {
-		data := frand.Bytes(benchmarkSize)
-
-		log.Info("starting upload")
-		uploadStart := time.Now()
-		_, err := worker.UploadObject(ctx, bytes.NewReader(data), "default", fmt.Sprintf("benchmark-%d", i+1), rapi.UploadObjectOptions{
-			MinShards:   10,
-			TotalShards: 30,
-		})
-		uploadDuration := time.Since(uploadStart)
-		if err != nil {
-			log.Panic("failed to upload object", zap.Error(err))
-		}
-		uploadTimes = append(uploadTimes, uploadDuration)
-		log.Info("uploaded 1 GiB object", zap.Duration("duration", uploadDuration))
+	data := frand.Bytes(benchmarkSize)
+	log.Info("starting upload")
+	uploadStart := time.Now()
+	_, err := worker.UploadObject(ctx, bytes.NewReader(data), "default", "benchmark-e2e", rapi.UploadObjectOptions{
+		MinShards:   10,
+		TotalShards: 30,
+	})
+	uploadDuration := time.Since(uploadStart)
+	if err != nil {
+		log.Panic("failed to upload object", zap.Error(err))
 	}
+	log.Info("uploaded  object", zap.Duration("duration", uploadDuration))
 
-	downloadTimes := make([]time.Duration, 0, iterations)
-	for i := range iterations {
-		log.Info("starting download")
-		downloadStart := time.Now()
-		err := worker.DownloadObject(ctx, io.Discard, "default", fmt.Sprintf("benchmark-%d", i+1), rapi.DownloadObjectOptions{})
-		downloadDuration := time.Since(downloadStart)
-		if err != nil {
-			log.Panic("failed to download object", zap.Error(err))
-		}
-		downloadTimes = append(downloadTimes, downloadDuration)
-		log.Info("downloaded 1 GiB object", zap.Duration("duration", downloadDuration))
+	log.Info("starting download")
+	downloadStart := time.Now()
+	tw := newTTFBWriter()
+	err = worker.DownloadObject(ctx, tw, "default", "benchmark-e2e", rapi.DownloadObjectOptions{})
+	downloadDuration := time.Since(downloadStart)
+	if err != nil {
+		log.Panic("failed to download object", zap.Error(err))
 	}
+	log.Info("downloaded  object", zap.Duration("duration", downloadDuration))
 
-	var uploadTime time.Duration
-	for _, t := range uploadTimes {
-		uploadTime += t
-	}
-	uploadDuration := uploadTime / time.Duration(iterations)
-
-	var downloadTime time.Duration
-	for _, t := range downloadTimes {
-		downloadTime += t
-	}
-	downloadDuration := downloadTime / time.Duration(iterations)
-
-	result := BenchmarkResult{
+	result := E2EBenchmarkResult{
 		CPU:           cpuid.CPU.BrandName,
 		HostdCommit:   hostVersion,
 		RenterdCommit: renterVersion,
 		ObjectSize:    benchmarkSize,
 		UploadTime:    uploadDuration,
 		DownloadTime:  downloadDuration,
+		TTFB:          tw.TTFB(),
 	}
 
-	if err := writeResult(outputPath, result); err != nil {
+	if err := writeE2EResult(outputPath, result); err != nil {
 		log.Panic("failed to write results", zap.Error(err))
 	}
 	return nil
 }
 
-func writeResult(outputPath string, results BenchmarkResult) error {
+func writeE2EResult(outputPath string, results E2EBenchmarkResult) error {
 	var writeHeader bool
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 		writeHeader = true
@@ -342,7 +322,7 @@ func writeResult(outputPath string, results BenchmarkResult) error {
 	enc := csv.NewWriter(f)
 
 	if writeHeader {
-		row := []string{"Timestamp", "OS", "Arch", "CPU", "hostd version", "renterd version", "upload speed", "download speed"}
+		row := []string{"Timestamp", "OS", "Arch", "CPU", "hostd Version", "renterd Version", "Upload Speed", "Download Speed", "TTFB"}
 		if err := enc.Write(row); err != nil {
 			return fmt.Errorf("failed to write header: %w", err)
 		}
@@ -357,6 +337,7 @@ func writeResult(outputPath string, results BenchmarkResult) error {
 		results.RenterdCommit,
 		fmt.Sprintf("%.4f Mbps", float64(results.ObjectSize*8/(1<<20))/results.UploadTime.Seconds()),
 		fmt.Sprintf("%.4f Mbps", float64(results.ObjectSize*8/(1<<20))/results.DownloadTime.Seconds()),
+		fmt.Sprintf("%d ms", results.TTFB.Milliseconds()),
 	}
 	if err := enc.Write(row); err != nil {
 		return fmt.Errorf("failed to write row: %w", err)

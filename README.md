@@ -10,9 +10,11 @@ The results published in this repository and the code to reproduce the benchmark
 
 ### End-to-End
 
-The end-to-end benchmark is designed to test the performance of a renterd node. It forms contracts with a number of hosts and tests the speed of encrypting, erasure-coding, uploading shards, downloading, and reconstruction in ideal production-like conditions. The benchmark performs four iterations using 160MiB test files and reports the average of the four iterations. 
+The end-to-end benchmark is designed to test the performance of a renterd node. It forms contracts with a number of hosts and tests the speed of encrypting, erasure-coding, uploading shards, downloading, and reconstruction in ideal production-like conditions. The benchmark uploads and downloads a 320MiB test file and reports speeds.
 
-*While the test data is 160MiB, the actual data uploaded to hosts is 480MiB due to 10-of-30 erasure-coding overhead. It would therefore be technically accurate to multiply the upload data size by three. However, the desire is to show the speed based on the file size a user uploads, not the redundant shards sent to hosts.*
+*While the test data is 320MiB, the actual data uploaded is 960MiB due to 10-of-30 erasure-coding overhead. It would therefore be technically accurate to multiply the upload data size by three. However, the desire is to show the speed based on the file size a user uploads, not the redundant shards sent to hosts.*
+
+*320 MiB was chosen since it aligns the object size with the erasure-coded slab size using the default erasure coding parameters*
 
 [Results](results/e2e.csv)
 
@@ -20,11 +22,4 @@ The end-to-end benchmark is designed to test the performance of a renterd node. 
 
 ```
 ./benchmark -hosts=50 -output=results
-```
-
-## Example Output
-
-```csv
-Timestamp,CPU,hostd version,renterd version,upload speed,download speed
-2024-09-17T11:30:58-07:00,Apple M1 Max,v1.1.3-0.20240913141601-573428f89b5f,v1.0.8-0.20240917130351-e7ad132b9077,679.3815 Mbps,1269.0282 Mbps
 ```
