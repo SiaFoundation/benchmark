@@ -42,7 +42,7 @@ func writeRHPResult(hostdVersion, outputPath string, result benchmarks.RHPResult
 		}
 	}
 
-	mbits := float64(result.Sectors*rhp2.SectorSize) * 8 / 1e6
+	mbits := float64(result.Sectors*rhp2.SectorSize*8) / 1e6
 	row := []string{
 		time.Now().Format(time.RFC3339),
 		runtime.GOOS,
@@ -91,7 +91,7 @@ func writeE2EResult(hostdVersion, renterdVersion, outputPath string, result benc
 		}
 	}
 
-	mbits := float64(result.ObjectSize) * 8 / 1e6
+	mbits := float64(result.ObjectSize*8) / 1e6
 	row := []string{
 		time.Now().Format(time.RFC3339),
 		runtime.GOOS,
