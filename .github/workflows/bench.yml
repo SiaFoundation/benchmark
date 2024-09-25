@@ -28,7 +28,7 @@ jobs:
           CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
           git reset --hard 
       - name: Run
-        run: ./bin/benchmark -hosts 50 -output results
+        run: ./bin/benchmark -output results
       - name: Add Result
         uses: peter-evans/create-pull-request@v7
         id: result
