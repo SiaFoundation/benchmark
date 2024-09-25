@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func writeRHP2Result(hostdVersion, outputPath string, result benchmarks.RHPResult) error {
+func writeRHPResult(hostdVersion, outputPath string, result benchmarks.RHPResult) error {
 	var writeHeader bool
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 		writeHeader = true
@@ -121,11 +121,18 @@ func main() {
 		outputPath string
 		dir        string
 		logLevel   string
+
+		runRHP2 bool
+		runRHP3 bool
+		runE2E  bool
 	)
 
 	flag.StringVar(&outputPath, "output", "results", "output directory for benchmark results")
 	flag.StringVar(&dir, "dir", "", "directory to store node data")
 	flag.StringVar(&logLevel, "log", "info", "logging level")
+	flag.BoolVar(&runRHP2, "rhp2", true, "run rhp2 benchmark")
+	flag.BoolVar(&runRHP3, "rhp3", true, "run rhp3 benchmark")
+	flag.BoolVar(&runE2E, "e2e", true, "run e2e benchmark")
 	flag.Parse()
 
 	if err := os.MkdirAll(outputPath, 0755); err != nil {
@@ -183,17 +190,27 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	rhp2, err := benchmarks.RHP2(ctx, dir, log.Named("rhp2"))
-	if err != nil {
-		log.Panic("failed to run rhp2 benchmark", zap.Error(err))
-	} else if err := writeRHP2Result(hostdVersion, filepath.Join(outputPath, "rhp2.csv"), rhp2); err != nil {
-		log.Panic("failed to write rhp2 result", zap.Error(err))
+	if runRHP2 {
+		if rhp2, err := benchmarks.RHP2(ctx, dir, log.Named("rhp2")); err != nil {
+			log.Panic("failed to run rhp2 benchmark", zap.Error(err))
+		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp2.csv"), rhp2); err != nil {
+			log.Panic("failed to write rhp2 result", zap.Error(err))
+		}
 	}
 
-	e2e, err := benchmarks.E2E(ctx, dir, log.Named("e2e"))
-	if err != nil {
-		log.Panic("failed to run e2e benchmark", zap.Error(err))
-	} else if err := writeE2EResult(hostdVersion, renterdVersion, filepath.Join(outputPath, "e2e.csv"), e2e); err != nil {
-		log.Panic("failed to write e2e result", zap.Error(err))
+	if runRHP3 {
+		if rhp3, err := benchmarks.RHP3(ctx, dir, log.Named("rhp3")); err != nil {
+			log.Panic("failed to run rhp2 benchmark", zap.Error(err))
+		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp3.csv"), rhp3); err != nil {
+			log.Panic("failed to write rhp2 result", zap.Error(err))
+		}
+	}
+
+	if runE2E {
+		if e2e, err := benchmarks.E2E(ctx, dir, log.Named("e2e")); err != nil {
+			log.Panic("failed to run e2e benchmark", zap.Error(err))
+		} else if err := writeE2EResult(hostdVersion, renterdVersion, filepath.Join(outputPath, "e2e.csv"), e2e); err != nil {
+			log.Panic("failed to write e2e result", zap.Error(err))
+		}
 	}
 }
