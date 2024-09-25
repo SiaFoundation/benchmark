@@ -18,6 +18,12 @@ The end-to-end benchmark is designed to test the performance of a renterd node. 
 
 [Results](results/e2e.csv)
 
+### RHP2
+
+The RHP2 benchmark is designed to test the performance of the RHP2 implementation in `hostd`. It forms a contract with a single host and tests the speed of uploading and downloading randomly generated sectors. The benchmark uploads and downloads 256 sectors, or 1GiB of data. To simulate production scenarios, the benchmark appends a single sector at a time instead of batching the appends into a single RPC. This will result in slightly slower speeds, but is more representative of how the host is used in production.
+
+[Results](results/rhp2.csv)
+
 ## Usage
 
 ```
