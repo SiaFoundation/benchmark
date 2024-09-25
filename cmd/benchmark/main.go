@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func writeRHP2Result(hostdVersion, renterdVersion, outputPath string, result benchmarks.RHPResult) error {
+func writeRHP2Result(hostdVersion, outputPath string, result benchmarks.RHPResult) error {
 	var writeHeader bool
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 		writeHeader = true
@@ -49,7 +49,6 @@ func writeRHP2Result(hostdVersion, renterdVersion, outputPath string, result ben
 		runtime.GOARCH,
 		cpuid.CPU.BrandName,
 		hostdVersion,
-		renterdVersion,
 		fmt.Sprintf("%.4f Mbps", mbits/result.UploadTime.Seconds()),
 		fmt.Sprintf("%.4f Mbps", mbits/result.DownloadTime.Seconds()),
 		fmt.Sprintf("%d ms", result.AppendSectorP99.Milliseconds()),
@@ -187,7 +186,7 @@ func main() {
 	rhp2, err := benchmarks.RHP2(ctx, dir, log.Named("rhp2"))
 	if err != nil {
 		log.Panic("failed to run rhp2 benchmark", zap.Error(err))
-	} else if err := writeRHP2Result(hostdVersion, renterdVersion, filepath.Join(outputPath, "rhp2.csv"), rhp2); err != nil {
+	} else if err := writeRHP2Result(hostdVersion, filepath.Join(outputPath, "rhp2.csv"), rhp2); err != nil {
 		log.Panic("failed to write rhp2 result", zap.Error(err))
 	}
 
