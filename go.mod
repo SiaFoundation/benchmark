@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.0.0-20240925055256-81346896658a
-	go.sia.tech/core v0.4.6
+	go.sia.tech/core v0.4.7
 	go.sia.tech/coreutils v0.3.2
 	go.sia.tech/renterd v1.1.0-beta.4.0.20240924095414-ccf2c9e57233
 	go.uber.org/zap v1.27.0
