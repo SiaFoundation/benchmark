@@ -91,8 +91,13 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 		return nil, fmt.Errorf("failed to trigger autopilot: %w", err)
 	}
 
-	// wait for contracts with all hosts to form
 	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
+
+	if err := bus.CreateBucket(ctx, "test", rapi.CreateBucketOptions{}); err != nil {
+		return nil, fmt.Errorf("failed to create bucket: %w", err)
+	}
+
+	// wait for contracts with all hosts to form
 	for i := 0; ; i++ {
 		select {
 		case <-ctx.Done():
@@ -191,7 +196,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	// upload the data
 	log.Info("starting upload")
 	uploadStart := time.Now()
-	_, err = worker.UploadObject(ctx, bytes.NewReader(data), "default", "benchmark-e2e", rapi.UploadObjectOptions{
+	_, err = worker.UploadObject(ctx, bytes.NewReader(data), "test", "benchmark-e2e", rapi.UploadObjectOptions{
 		MinShards:   10,
 		TotalShards: 30,
 	})
@@ -205,7 +210,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	log.Info("starting download")
 	downloadStart := time.Now()
 	tw := newTTFBWriter()
-	err = worker.DownloadObject(ctx, tw, "default", "benchmark-e2e", rapi.DownloadObjectOptions{})
+	err = worker.DownloadObject(ctx, tw, "test", "benchmark-e2e", rapi.DownloadObjectOptions{})
 	downloadDuration := time.Since(downloadStart)
 	if err != nil {
 		return E2EResult{}, fmt.Errorf("failed to download object: %w", err)
