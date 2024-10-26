@@ -94,6 +94,7 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
 
 	err = bus.UpdateUploadSettings(ctx, rapi.UploadSettings{
+		DefaultContractSet: "autopilot",
 		Packing: rapi.UploadPackingSettings{
 			Enabled: false,
 		},
