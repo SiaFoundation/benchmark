@@ -124,6 +124,7 @@ func main() {
 
 		runRHP2 bool
 		runRHP3 bool
+		runRHP4 bool
 		runE2E  bool
 	)
 
@@ -132,6 +133,7 @@ func main() {
 	flag.StringVar(&logLevel, "log", "info", "logging level")
 	flag.BoolVar(&runRHP2, "rhp2", false, "run rhp2 benchmark")
 	flag.BoolVar(&runRHP3, "rhp3", false, "run rhp3 benchmark")
+	flag.BoolVar(&runRHP4, "rhp4", false, "run rhp4 benchmark")
 	flag.BoolVar(&runE2E, "e2e", false, "run e2e benchmark")
 	flag.Parse()
 
@@ -202,6 +204,14 @@ func main() {
 		if rhp3, err := benchmarks.RHP3(ctx, dir, log.Named("rhp3")); err != nil {
 			log.Panic("failed to run rhp2 benchmark", zap.Error(err))
 		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp3.csv"), rhp3); err != nil {
+			log.Panic("failed to write rhp2 result", zap.Error(err))
+		}
+	}
+
+	if runRHP4 {
+		if rhp4, err := benchmarks.RHP4(ctx, dir, log.Named("rhp4")); err != nil {
+			log.Panic("failed to run rhp4 benchmark", zap.Error(err))
+		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp4.csv"), rhp4); err != nil {
 			log.Panic("failed to write rhp2 result", zap.Error(err))
 		}
 	}
