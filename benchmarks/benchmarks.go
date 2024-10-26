@@ -20,7 +20,7 @@ func benchmarkV1Network() (*consensus.Network, types.Block) {
 	n.HardforkFoundation.Height = 1
 	n.HardforkV2.AllowHeight = 1000000 // should be unattainable
 	n.HardforkV2.RequireHeight = 1200000
-	n.MaturityDelay = 10
+	n.MaturityDelay = 5
 	n.BlockInterval = time.Second
 	return n, genesis
 }

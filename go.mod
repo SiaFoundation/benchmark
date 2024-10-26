@@ -6,7 +6,7 @@ toolchain go1.23.2
 
 require (
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.0
+	go.sia.tech/cluster v0.1.1-0.20241026072104-bcc27ab4720e
 	go.sia.tech/core v0.5.0
 	go.sia.tech/coreutils v0.5.0
 	go.sia.tech/renterd v1.1.0-beta.4.0.20241025151653-2b933326be16
