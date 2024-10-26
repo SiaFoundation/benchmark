@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -155,6 +156,11 @@ func (s *Session) AppendSector(index types.ChainIndex, sector *[rhp2.SectorSize]
 	stream := s.t.DialStream()
 	defer stream.Close()
 
+	rootCh := make(chan types.Hash256, 1)
+	go func() {
+		rootCh <- rhp2.SectorRoot(sector)
+	}()
+
 	req := rhp3.RPCExecuteProgramRequest{
 		FileContractID: revision.ID(),
 		Program: []rhp3.Instruction{
@@ -186,7 +192,19 @@ func (s *Session) AppendSector(index types.ChainIndex, sector *[rhp2.SectorSize]
 	} else if resp.NewSize != revision.Revision.Filesize+rhp2.SectorSize {
 		return types.ZeroCurrency, fmt.Errorf("unexpected filesize: %v != %v", resp.NewSize, revision.Revision.Filesize+rhp2.SectorSize)
 	}
-	//TODO: validate proof
+
+	root := <-rootCh
+	if revision.Revision.Filesize == 0 {
+		if resp.NewMerkleRoot != root {
+			return types.ZeroCurrency, fmt.Errorf("merkle root doesn't match sector root: %v != %v", resp.NewMerkleRoot, root)
+		}
+	} else {
+		// Otherwise we make sure the proof was transmitted and verify it.
+		actions := []rhp2.RPCWriteAction{{Type: rhp2.RPCWriteActionAppend}} // TODO: change once rhpv3 support is available
+		if !rhp2.VerifyDiffProof(actions, revision.Revision.Filesize/rhp2.SectorSize, resp.Proof, []types.Hash256{}, revision.Revision.FileMerkleRoot, resp.NewMerkleRoot, []types.Hash256{root}) {
+			return types.ZeroCurrency, errors.New("proof verification failed")
+		}
+	}
 	// revise the contract
 	revised := revision.Revision
 	revised.RevisionNumber++
@@ -294,7 +312,17 @@ func (s *Session) ReadSector(index types.ChainIndex, w io.Writer, root types.Has
 	} else if len(resp.Output) != int(length) {
 		return types.ZeroCurrency, fmt.Errorf("unexpected output length: %v != %v", len(resp.Output), length)
 	}
-	_, err := io.Copy(w, bytes.NewReader(resp.Output))
+
+	// verify proof
+	proofStart := uint64(offset) / rhp2.LeafSize
+	proofEnd := uint64(offset+length) / rhp2.LeafSize
+	verifier := rhp2.NewRangeProofVerifier(proofStart, proofEnd)
+	_, err := verifier.ReadFrom(io.TeeReader(bytes.NewReader(resp.Output), w))
+	if err != nil {
+		return types.ZeroCurrency, fmt.Errorf("failed to read proof: %w", err)
+	} else if !verifier.Verify(resp.Proof, root) {
+		return types.ZeroCurrency, errors.New("proof verification failed")
+	}
 	return resp.TotalCost, err
 }
 
