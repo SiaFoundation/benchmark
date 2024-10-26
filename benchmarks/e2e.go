@@ -144,6 +144,8 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 		// contract formation.
 		if err := nm.MineBlocks(ctx, 1, renterAddr); err != nil {
 			return nil, fmt.Errorf("failed to mine blocks: %w", err)
+		} else if _, err := autopilot.Trigger(true); err != nil {
+			return nil, fmt.Errorf("failed to trigger autopilot: %w", err)
 		}
 	}
 	return worker.NewClient(renter.APIAddress+"/api/worker", renter.Password), nil
