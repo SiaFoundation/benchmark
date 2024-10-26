@@ -6,10 +6,10 @@ toolchain go1.23.2
 
 require (
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.0.0-20241023140234-8f8ca759a639
+	go.sia.tech/cluster v0.0.0-20241026012303-a2a1709f0ba6
 	go.sia.tech/core v0.4.8-0.20240928202806-0e77790bd8bf
 	go.sia.tech/coreutils v0.4.2-0.20241017012544-0b4946403c93
-	go.sia.tech/renterd v1.1.0-beta.4.0.20241023123004-609d9c36d290
+	go.sia.tech/renterd v1.1.0-beta.4.0.20241025151653-2b933326be16
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
 	lukechampine.com/frand v1.5.1
