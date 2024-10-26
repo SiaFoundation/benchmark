@@ -202,9 +202,9 @@ func main() {
 
 	if runRHP3 {
 		if rhp3, err := benchmarks.RHP3(ctx, dir, log.Named("rhp3")); err != nil {
-			log.Panic("failed to run rhp2 benchmark", zap.Error(err))
+			log.Panic("failed to run rhp3 benchmark", zap.Error(err))
 		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp3.csv"), rhp3); err != nil {
-			log.Panic("failed to write rhp2 result", zap.Error(err))
+			log.Panic("failed to write rhp3 result", zap.Error(err))
 		}
 	}
 
@@ -212,7 +212,7 @@ func main() {
 		if rhp4, err := benchmarks.RHP4(ctx, dir, log.Named("rhp4")); err != nil {
 			log.Panic("failed to run rhp4 benchmark", zap.Error(err))
 		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp4.csv"), rhp4); err != nil {
-			log.Panic("failed to write rhp2 result", zap.Error(err))
+			log.Panic("failed to write rhp4 result", zap.Error(err))
 		}
 	}
 
