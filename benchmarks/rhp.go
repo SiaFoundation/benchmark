@@ -20,11 +20,11 @@ import (
 	"go.sia.tech/coreutils/chain"
 	"go.sia.tech/coreutils/syncer"
 	"go.sia.tech/coreutils/testutil"
+	"go.sia.tech/coreutils/wallet"
 	rapi "go.sia.tech/renterd/api"
 	"go.sia.tech/renterd/autopilot"
 	"go.sia.tech/renterd/bus"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/blake2b"
 	"lukechampine.com/frand"
 )
 
@@ -37,31 +37,90 @@ type RHPResult struct {
 	ReadSectorTTFB  time.Duration `json:"readSectorTTFB"`
 }
 
-// had to rewrite instead of importing from renterd because Chris is mean
-func deriveContractKey(renterKey types.PrivateKey, hostKey types.PublicKey) types.PrivateKey {
-	h, _ := blake2b.New256(nil)
-	defer h.Reset()
-	h.Write(renterKey[:32])
-	h.Write([]byte("renterkey"))
-	seed := types.NewPrivateKeyFromSeed(h.Sum(nil))
-	h.Reset()
-	h.Write(seed)
-	h.Write(hostKey[:])
-	return types.NewPrivateKeyFromSeed(h.Sum(nil))
+// helper to scan the chain and update the wallet. Should only be used with a
+// local testnet.
+func scanWallet(ctx context.Context, cm *chain.Manager, sw *wallet.SingleAddressWallet, ss *testutil.EphemeralWalletStore) error {
+	var index types.ChainIndex
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		var done bool
+		err := ss.UpdateChainState(func(ux wallet.UpdateTx) error {
+			var applied []chain.ApplyUpdate
+			reverted, applied, err := cm.UpdatesSince(index, 1000)
+			if err != nil {
+				return fmt.Errorf("failed to get updates: %w", err)
+			} else if len(applied) == 0 && len(reverted) == 0 {
+				done = true
+				return nil
+			}
+
+			if len(applied) > 0 {
+				index = applied[len(applied)-1].State.Index
+			} else if len(reverted) > 0 {
+				index = reverted[len(reverted)-1].State.Index
+			}
+
+			return sw.UpdateChainState(ux, reverted, applied)
+		})
+		if err != nil {
+			return err
+		} else if done {
+			return nil
+		}
+	}
 }
 
-// had to rewrite instead of importing from renterd because Chris is mean
-func deriveAccountKey(renterKey types.PrivateKey, hostKey types.PublicKey) types.PrivateKey {
-	h, _ := blake2b.New256(nil)
-	defer h.Reset()
-	h.Write(renterKey[:32])
-	h.Write([]byte("accounts/worker")) // hardcoding the worker ID from cluster
-	seed := types.NewPrivateKeyFromSeed(h.Sum(nil))
-	h.Reset()
-	h.Write(seed)
-	h.Write(hostKey[:])
-	h.Write([]byte{0}) // hardcoding the index
-	return types.NewPrivateKeyFromSeed(h.Sum(nil))
+func setupRenterWallet(ctx context.Context, cm *chain.Manager, nm *nodes.Manager, renterKey types.PrivateKey) (*wallet.SingleAddressWallet, error) {
+	// mine some utxos for the renter
+	renterAddr := types.StandardUnlockHash(renterKey.PublicKey())
+	if err := nm.MineBlocks(ctx, 150, renterAddr); err != nil {
+		return nil, fmt.Errorf("failed to mine blocks: %w", err)
+	}
+
+	// create a wallet for the renter
+	ws := testutil.NewEphemeralWalletStore()
+	sw, err := wallet.NewSingleAddressWallet(renterKey, cm, ws)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create renter wallet: %w", err)
+	}
+	defer sw.Close()
+
+	if err := scanWallet(ctx, cm, sw, ws); err != nil {
+		return nil, fmt.Errorf("failed to scan wallet: %w", err)
+	}
+	return sw, nil
+}
+
+// helper to get the last host announcement. Scans the whole chain. Should only
+// be used with a local testnet.
+func findHostAnnouncement(cm *chain.Manager, sk types.PrivateKey) (address string, err error) {
+	var index types.ChainIndex
+	hostKey := sk.PublicKey()
+	for {
+		var applied []chain.ApplyUpdate
+		_, applied, err = cm.UpdatesSince(index, 1000)
+		if err != nil {
+			return "", fmt.Errorf("failed to get updates: %w", err)
+		} else if len(applied) == 0 {
+			if address == "" {
+				err = fmt.Errorf("host announcement not found")
+			}
+			return
+		}
+		for _, cau := range applied {
+			chain.ForEachHostAnnouncement(cau.Block, func(a chain.HostAnnouncement) {
+				if a.PublicKey == hostKey {
+					address = a.NetAddress
+				}
+			})
+			index = cau.State.Index
+		}
+	}
 }
 
 // setupRHPBenchmark creates a testnet with a single host and renter node
@@ -193,24 +252,34 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	nm := nodes.NewManager(dir, cm, s, log.Named("cluster"))
 	defer nm.Close()
 
-	// grab the contract details
-	bus, renterKey, err := setupRHPBenchmark(ctx, nm, log)
+	hostKey, renterKey := types.GeneratePrivateKey(), types.GeneratePrivateKey()
+
+	// start the host
+	ready := make(chan struct{}, 1)
+	go func() {
+		// started in a goroutine to avoid blocking
+		if err := nm.StartHostd(ctx, hostKey, ready); err != nil {
+			log.Panic("hostd failed to start", zap.Error(err))
+		}
+	}()
+	select {
+	case <-ctx.Done():
+		return RHPResult{}, ctx.Err()
+	case <-ready:
+	}
+
+	rw, err := setupRenterWallet(ctx, cm, nm, renterKey)
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to setup benchmark: %w", err)
 	}
 
-	contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{ContractSet: "autopilot"})
+	// wait for syncing
+	time.Sleep(15 * time.Second) // TODO: be better
+
+	hostAddress, err := findHostAnnouncement(cm, hostKey)
 	if err != nil {
-		return RHPResult{}, fmt.Errorf("failed to get contracts: %w", err)
-	} else if len(contracts) == 0 {
-		return RHPResult{}, fmt.Errorf("no contracts found")
+		return RHPResult{}, fmt.Errorf("failed to find host announcement: %w", err)
 	}
-
-	time.Sleep(10 * time.Second) // TODO: replace this with an actual check that the host has finished syncing
-
-	contract := contracts[0]
-	hostAddress, hostKey := contract.HostIP, contract.HostKey
-	contractID := contract.ID
 
 	// create an RHP2 transport
 	conn, err := net.Dial("tcp", hostAddress)
@@ -219,7 +288,7 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	}
 	defer conn.Close()
 
-	transport, err := proto2.NewRenterTransport(conn, hostKey)
+	transport, err := proto2.NewRenterTransport(conn, hostKey.PublicKey())
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to create transport: %w", err)
 	}
@@ -231,14 +300,25 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		return RHPResult{}, fmt.Errorf("failed to get host settings: %w", err)
 	}
 
-	log.Debug("locked contract", zap.Stringer("contractID", contractID))
-	contractKey := deriveContractKey(renterKey, hostKey)
-	// get the latest contract revision
-	revision, err := rhp2.RPCLock(transport, contractKey, contractID)
+	fc := proto2.PrepareContractFormation(renterKey.PublicKey(), hostKey.PublicKey(), types.Siacoins(50), types.Siacoins(100), cm.Tip().Height+200, settings, rw.Address())
+	formationTxn := types.Transaction{
+		FileContracts: []types.FileContract{fc},
+	}
+	toSign, err := rw.FundTransaction(&formationTxn, proto2.ContractFormationCost(cm.TipState(), fc, settings.ContractPrice), false)
+	if err != nil {
+		return RHPResult{}, fmt.Errorf("failed to fund contract formation: %w", err)
+	}
+	rw.SignTransaction(&formationTxn, toSign, wallet.ExplicitCoveredFields(formationTxn))
+
+	revision, _, err := rhp2.RPCFormContract(transport, renterKey, []types.Transaction{formationTxn})
+	if err != nil {
+		return RHPResult{}, fmt.Errorf("failed to form contract: %w", err)
+	}
+
+	revision, err = rhp2.RPCLock(transport, renterKey, revision.ID())
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to lock contract: %w", err)
 	}
-	defer rhp2.RPCUnlock(transport)
 
 	// upload the data
 	log.Info("starting upload")
@@ -257,7 +337,7 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		}
 		cost, collateral := usage.Total()
 		start := time.Now()
-		if err := rhp2.RPCWrite(transport, contractKey, &revision, actions, cost, collateral); err != nil {
+		if err := rhp2.RPCWrite(transport, renterKey, &revision, actions, cost, collateral); err != nil {
 			return RHPResult{}, fmt.Errorf("failed to write sector %d: %w", i+1, err)
 		}
 		appendTimes = append(appendTimes, time.Since(start))
@@ -281,7 +361,7 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		cost, _ := usage.Total()
 		tw := newTTFBWriter()
 		start := time.Now()
-		if err := rhp2.RPCRead(transport, tw, contractKey, &revision, sections, cost); err != nil {
+		if err := rhp2.RPCRead(transport, tw, renterKey, &revision, sections, cost); err != nil {
 			return RHPResult{}, fmt.Errorf("failed to read sector: %w", err)
 		}
 		readTimes = append(readTimes, time.Since(start))
@@ -313,37 +393,6 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	result.ReadSectorTTFB = ttfbTimes[i]
 
 	return result, nil
-}
-
-func getRHPRevisionSettings(ctx context.Context, hostAddress string, hostKey types.PublicKey, contractID types.FileContractID, contractKey types.PrivateKey) (proto2.ContractRevision, proto2.HostSettings, error) {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	// create an RHP2 transport
-	conn, err := (&net.Dialer{}).DialContext(ctx, "tcp", hostAddress)
-	if err != nil {
-		return proto2.ContractRevision{}, proto2.HostSettings{}, fmt.Errorf("failed to dial host: %w", err)
-	}
-	defer conn.Close()
-
-	transport, err := proto2.NewRenterTransport(conn, hostKey)
-	if err != nil {
-		return proto2.ContractRevision{}, proto2.HostSettings{}, fmt.Errorf("failed to create transport: %w", err)
-	}
-	defer transport.Close()
-
-	settings, err := rhp2.RPCSettings(transport)
-	if err != nil {
-		return proto2.ContractRevision{}, proto2.HostSettings{}, fmt.Errorf("failed to get host settings: %w", err)
-	}
-
-	revision, err := rhp2.RPCLock(transport, contractKey, contractID)
-	if err != nil {
-		return proto2.ContractRevision{}, proto2.HostSettings{}, fmt.Errorf("failed to lock contract: %w", err)
-	}
-	defer rhp2.RPCUnlock(transport)
-
-	return revision, settings, nil
 }
 
 func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
@@ -407,47 +456,70 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	nm := nodes.NewManager(dir, cm, s, log.Named("cluster"))
 	defer nm.Close()
 
-	// grab the contract details
-	bus, renterKey, err := setupRHPBenchmark(ctx, nm, log)
+	hostKey, renterKey := types.GeneratePrivateKey(), types.GeneratePrivateKey()
+
+	// start the host
+	ready := make(chan struct{}, 1)
+	go func() {
+		// started in a goroutine to avoid blocking
+		if err := nm.StartHostd(ctx, hostKey, ready); err != nil {
+			log.Panic("hostd failed to start", zap.Error(err))
+		}
+	}()
+	select {
+	case <-ctx.Done():
+		return RHPResult{}, ctx.Err()
+	case <-ready:
+	}
+
+	rw, err := setupRenterWallet(ctx, cm, nm, renterKey)
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to setup benchmark: %w", err)
 	}
 
-	contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{ContractSet: "autopilot"})
+	// wait for syncing
+	time.Sleep(15 * time.Second) // TODO: be better
+
+	hostAddress, err := findHostAnnouncement(cm, hostKey)
 	if err != nil {
-		return RHPResult{}, fmt.Errorf("failed to get contracts: %w", err)
-	} else if len(contracts) == 0 {
-		return RHPResult{}, fmt.Errorf("no contracts found")
+		return RHPResult{}, fmt.Errorf("failed to find host announcement: %w", err)
 	}
 
-	time.Sleep(10 * time.Second) // TODO: replace this with an actual check that the host has finished syncing
-
-	contract := contracts[0]
-	hostAddress, hostKey := contract.HostIP, contract.HostKey
-	contractID := contract.ID
-
-	log.Debug("getting contract")
-
-	// lock the contract so renterd doesn't interfere
-	lockCtx, lockCancel := context.WithTimeout(ctx, 30*time.Second)
-	defer lockCancel()
-
-	lock, err := bus.AcquireContract(lockCtx, contractID, 30, 5*time.Minute)
+	// create an RHP2 transport
+	conn, err := net.Dial("tcp", hostAddress)
 	if err != nil {
-		return RHPResult{}, fmt.Errorf("failed to lock contract: %w", err)
+		return RHPResult{}, fmt.Errorf("failed to dial host: %w", err)
 	}
-	defer bus.ReleaseContract(ctx, contractID, lock)
+	defer conn.Close()
 
-	log.Debug("contract locked")
-
-	// get the latest revision of the contract
-	contractKey := deriveContractKey(renterKey, hostKey)
-	revision, settings, err := getRHPRevisionSettings(ctx, hostAddress, hostKey, contractID, contractKey)
+	transport, err := proto2.NewRenterTransport(conn, hostKey.PublicKey())
 	if err != nil {
-		return RHPResult{}, fmt.Errorf("failed to get contract revision: %w", err)
+		return RHPResult{}, fmt.Errorf("failed to create transport: %w", err)
+	}
+	defer transport.Close()
+
+	// get the host's settings
+	settings, err := rhp2.RPCSettings(transport)
+	if err != nil {
+		return RHPResult{}, fmt.Errorf("failed to get host settings: %w", err)
 	}
 
-	log.Debug("got contract")
+	fc := proto2.PrepareContractFormation(renterKey.PublicKey(), hostKey.PublicKey(), types.Siacoins(50), types.Siacoins(100), cm.Tip().Height+100, settings, rw.Address())
+	formationTxn := types.Transaction{
+		FileContracts: []types.FileContract{fc},
+	}
+	toSign, err := rw.FundTransaction(&formationTxn, proto2.ContractFormationCost(cm.TipState(), fc, settings.ContractPrice), false)
+	if err != nil {
+		return RHPResult{}, fmt.Errorf("failed to fund contract formation: %w", err)
+	}
+	rw.SignTransaction(&formationTxn, toSign, wallet.ExplicitCoveredFields(formationTxn))
+
+	revision, _, err := rhp2.RPCFormContract(transport, renterKey, []types.Transaction{formationTxn})
+	if err != nil {
+		return RHPResult{}, fmt.Errorf("failed to form contract: %w", err)
+	} else if err := transport.Close(); err != nil {
+		return RHPResult{}, fmt.Errorf("failed to close rhp2 transport: %w", err)
+	}
 
 	addr, _, err := net.SplitHostPort(hostAddress)
 	if err != nil {
@@ -458,7 +530,7 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	// create an RHP3 transport
 	rhp3Ctx, rhp3Cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer rhp3Cancel()
-	session, err := rhp3.NewSession(rhp3Ctx, hostKey, rhp3Address)
+	session, err := rhp3.NewSession(rhp3Ctx, hostKey.PublicKey(), rhp3Address)
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to create session: %w", err)
 	}
@@ -466,11 +538,9 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 
 	log.Debug("creating session")
 
-	accountKey := deriveAccountKey(renterKey, hostKey)
-
-	accountID := proto3.Account(accountKey.PublicKey())
-	accountPayment := rhp3.AccountPayment(accountID, accountKey)
-	contractPayment := rhp3.ContractPayment(&revision, contractKey, accountID)
+	accountID := proto3.Account(renterKey.PublicKey())
+	accountPayment := rhp3.AccountPayment(accountID, renterKey)
+	contractPayment := rhp3.ContractPayment(&revision, renterKey, accountID)
 
 	// register the price table
 	if _, err := session.RegisterPriceTable(cm.Tip(), accountPayment); err != nil {
@@ -490,7 +560,7 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		sector := (*[proto2.SectorSize]byte)(frand.Bytes(proto2.SectorSize))
 
 		start := time.Now()
-		_, err := session.AppendSector(cm.Tip(), sector, &revision, contractKey, accountPayment, types.Siacoins(1).Div64(10)) // just overpay
+		_, err := session.AppendSector(cm.Tip(), sector, &revision, renterKey, accountPayment, types.Siacoins(1).Div64(10)) // just overpay
 		appendTimes = append(appendTimes, time.Since(start))
 		if err != nil {
 			return RHPResult{}, fmt.Errorf("failed to append sector %d: %w", i+1, err)

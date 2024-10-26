@@ -11,7 +11,6 @@ require (
 	go.sia.tech/coreutils v0.4.2-0.20241017012544-0b4946403c93
 	go.sia.tech/renterd v1.1.0-beta.4.0.20241025151653-2b933326be16
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.28.0
 	lukechampine.com/frand v1.5.1
 )
 
@@ -39,6 +38,7 @@ require (
 	go.sia.tech/mux v1.3.0 // indirect
 	go.sia.tech/walletd v0.8.1-0.20241021164545-5b34e523f8df // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
