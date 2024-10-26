@@ -1,10 +1,8 @@
 # Benchmark
 
-A simple benchmarking tool to generate easy to reproduce benchmarks for the Sia ecosystem. Each benchmark gets a distinct testnet using [cluster](https://github.com/SiaFoundation/cluster). The benchmarks are designed to be run on a machine with a large number of cores to support the number of concurrent processes.
+A simple benchmarking tool to generate easy to reproduce benchmarks for the Sia ecosystem. Each benchmark gets a distinct testnet using [cluster](https://github.com/SiaFoundation/cluster). The benchmarks are designed to be run on a machine with a large number of cores to support the number of concurrent processes. These benchmarks are intended to track performance over time and identify regressions.
 
-We will add additional benchmarks specifically for single host/renter interactions using RHP3 as a baseline for testing regressions.
-
-The results published in this repository and the code to reproduce the benchmarks are under the MIT license.
+The results published in this repository and the code to reproduce the benchmarks are released under the MIT license.
 
 ## Benchmarks
 
@@ -29,6 +27,14 @@ The RHP2 benchmark is designed to test the performance of the RHP2 implementatio
 The RHP3 benchmark is designed to test the performance of the RHP3 implementation in `hostd`. It forms a contract with a single host and tests the speed of uploading and downloading randomly generated sectors. The benchmark uploads and downloads 256 sectors, or 1GiB of data. To simulate production scenarios, the benchmark appends a single sector at a time instead of batching the appends into a single MDM program. This will result in slightly slower speeds, but is more representative of how RHP3 is used in production.
 
 [Results](results/rhp3.csv)
+
+### RHP4
+
+The RHP4 benchmark is designed to test the performance of the RHP4 implementation in `hostd`. It forms a contract with a single host and tests the speed of uploading and downloading randomly generated sectors. The benchmark uploads and downloads 256 sectors, or 1GiB of data.
+
+*RHP4 is still in development and not available on Mainnet yet*
+
+[Results](results/rhp4.csv)
 
 ## Usage
 
