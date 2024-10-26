@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"go.sia.tech/cluster/nodes"
+	"go.sia.tech/core/consensus"
 	"go.sia.tech/core/gateway"
 	rhp2 "go.sia.tech/core/rhp/v2"
 	"go.sia.tech/core/types"
@@ -37,7 +38,16 @@ type E2EResult struct {
 // setupE2EBenchmark creates a testnet with the given number of hosts and a
 // single renter. It waits for the renter to form contracts with all hosts
 // before returning.
-func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, log *zap.Logger) (*worker.Client, error) {
+func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *nodes.Manager, hostCount int, log *zap.Logger) (*worker.Client, error) {
+	renterKey := types.GeneratePrivateKey()
+
+	// mine additional blocks to ensure the renter has enough funds to form
+	// contracts
+	renterAddr := types.StandardUnlockHash(renterKey.PublicKey())
+	if err := nm.MineBlocks(ctx, 50+int(network.MaturityDelay), renterAddr); err != nil {
+		return nil, fmt.Errorf("failed to mine blocks: %w", err)
+	}
+
 	// start the hosts
 	for i := 0; i < hostCount; i++ {
 		ready := make(chan struct{}, 1)
@@ -51,6 +61,7 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-ready:
+			log.Info("started hostd node", zap.Int("nodes", i+1))
 		}
 	}
 
@@ -58,7 +69,7 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 	ready := make(chan struct{}, 1)
 	go func() {
 		// started in a goroutine to avoid blocking
-		if err := nm.StartRenterd(ctx, types.GeneratePrivateKey(), ready); err != nil {
+		if err := nm.StartRenterd(ctx, renterKey, ready); err != nil {
 			log.Panic("renterd failed to start", zap.Error(err))
 		}
 	}()
@@ -82,15 +93,6 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 		return nil, fmt.Errorf("failed to update autopilot config: %w", err)
 	}
 
-	// mine until all payouts have matured
-	if err := nm.MineBlocks(ctx, 144, types.VoidAddress); err != nil {
-		return nil, fmt.Errorf("failed to mine blocks: %w", err)
-	}
-
-	if _, err := autopilot.Trigger(true); err != nil {
-		return nil, fmt.Errorf("failed to trigger autopilot: %w", err)
-	}
-
 	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
 
 	err = bus.UpdateUploadSettings(ctx, rapi.UploadSettings{
@@ -111,6 +113,18 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 		return nil, fmt.Errorf("failed to create bucket: %w", err)
 	}
 
+	// mine until all payouts have matured
+	if err := nm.MineBlocks(ctx, 10, renterAddr); err != nil {
+		return nil, fmt.Errorf("failed to mine blocks: %w", err)
+	}
+
+	// wait for nodes to sync
+	time.Sleep(30 * time.Second) // TODO: be better
+
+	if _, err := autopilot.Trigger(true); err != nil {
+		return nil, fmt.Errorf("failed to trigger autopilot: %w", err)
+	}
+
 	// wait for contracts with all hosts to form
 	for i := 0; ; i++ {
 		select {
@@ -128,7 +142,7 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 		log.Info("waiting for contracts", zap.Int("count", len(contracts)))
 		// bit of a hack to ensure the nodes end up in a good state during
 		// contract formation.
-		if err := nm.MineBlocks(ctx, 1, types.VoidAddress); err != nil {
+		if err := nm.MineBlocks(ctx, 1, renterAddr); err != nil {
 			return nil, fmt.Errorf("failed to mine blocks: %w", err)
 		}
 	}
@@ -199,7 +213,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	defer nm.Close()
 
 	// setup the benchmark
-	worker, err := setupE2EBenchmark(ctx, nm, 50, log)
+	worker, err := setupE2EBenchmark(ctx, n, nm, 50, log)
 	if err != nil {
 		return E2EResult{}, fmt.Errorf("failed to setup benchmark: %w", err)
 	}
