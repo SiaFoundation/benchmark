@@ -6,7 +6,7 @@ on:
       hostd-version:
         description: hostd commit hash or branch name to use
         required: false
-        default: 'master'
+        default: ''
       renterd-version:
         description: renterd commit hash or branch name to use
         required: false
@@ -28,9 +28,15 @@ jobs:
         with:
           go-version: stable
       - name: Prepare
+        env:
+          HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version }}
+          RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version }}
         run: |
-          go get go.sia.tech/hostd@${{ github.event.inputs.hostd-version || 'master' }}
-          go get go.sia.tech/renterd@${{ github.event.inputs.renterd-version || 'dev' }}
+          if [ -z "$HOSTD_UPDATE_TARGET" ]; then
+            HOSTD_UPDATE_TARGET=$(git ls-remote https://github.com/siafoundation/hostd -q nate/rhp4 | awk '{print $1}')
+          fi
+          go get go.sia.tech/hostd@$HOSTD_UPDATE_TARGET
+          go get go.sia.tech/renterd@$RENTERD_UPDATE_TARGET
           go mod tidy
 
           mkdir -p results
