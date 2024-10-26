@@ -504,7 +504,7 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		return RHPResult{}, fmt.Errorf("failed to get host settings: %w", err)
 	}
 
-	fc := proto2.PrepareContractFormation(renterKey.PublicKey(), hostKey.PublicKey(), types.Siacoins(50), types.Siacoins(100), cm.Tip().Height+100, settings, rw.Address())
+	fc := proto2.PrepareContractFormation(renterKey.PublicKey(), hostKey.PublicKey(), types.Siacoins(50), types.Siacoins(100), cm.Tip().Height+200, settings, rw.Address())
 	formationTxn := types.Transaction{
 		FileContracts: []types.FileContract{fc},
 	}
@@ -543,11 +543,9 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	contractPayment := rhp3.ContractPayment(&revision, renterKey, accountID)
 
 	// register the price table
-	if _, err := session.RegisterPriceTable(cm.Tip(), accountPayment); err != nil {
+	if _, err := session.RegisterPriceTable(cm.Tip(), contractPayment); err != nil {
 		return RHPResult{}, fmt.Errorf("failed to register price table: %w", err)
-	}
-
-	if _, err := session.FundAccount(cm.Tip(), accountID, contractPayment, types.Siacoins(5)); err != nil {
+	} else if _, err := session.FundAccount(cm.Tip(), accountID, contractPayment, types.Siacoins(10)); err != nil {
 		return RHPResult{}, fmt.Errorf("failed to fund account: %w", err)
 	}
 
@@ -567,10 +565,6 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		}
 		roots = append(roots, proto2.SectorRoot(sector))
 		log.Debug("appended sector", zap.Duration("elapsed", appendTimes[len(appendTimes)-1]), zap.Int("n", i+1))
-	}
-
-	if _, err := session.FundAccount(cm.Tip(), accountID, contractPayment, types.Siacoins(5)); err != nil {
-		return RHPResult{}, fmt.Errorf("failed to fund account: %w", err)
 	}
 
 	// download the data
