@@ -78,7 +78,7 @@ func scanWallet(ctx context.Context, cm *chain.Manager, sw *wallet.SingleAddress
 func setupRenterWallet(ctx context.Context, cm *chain.Manager, nm *nodes.Manager, renterKey types.PrivateKey) (*wallet.SingleAddressWallet, error) {
 	// mine some utxos for the renter
 	renterAddr := types.StandardUnlockHash(renterKey.PublicKey())
-	if err := nm.MineBlocks(ctx, 150, renterAddr); err != nil {
+	if err := nm.MineBlocks(ctx, 20, renterAddr); err != nil {
 		return nil, fmt.Errorf("failed to mine blocks: %w", err)
 	}
 
@@ -154,7 +154,7 @@ func setupRHPBenchmark(ctx context.Context, nm *nodes.Manager, log *zap.Logger) 
 	}
 
 	// mine until all payouts have matured
-	if err := nm.MineBlocks(ctx, 144, types.VoidAddress); err != nil {
+	if err := nm.MineBlocks(ctx, 10, types.VoidAddress); err != nil {
 		return nil, types.PrivateKey{}, fmt.Errorf("failed to mine blocks: %w", err)
 	}
 
