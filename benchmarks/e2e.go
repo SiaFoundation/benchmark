@@ -93,6 +93,19 @@ func setupE2EBenchmark(ctx context.Context, nm *nodes.Manager, hostCount int, lo
 
 	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
 
+	err = bus.UpdateUploadSettings(ctx, rapi.UploadSettings{
+		Packing: rapi.UploadPackingSettings{
+			Enabled: false,
+		},
+		Redundancy: rapi.RedundancySettings{
+			MinShards:   10,
+			TotalShards: 30,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to update upload settings: %w", err)
+	}
+
 	if err := bus.CreateBucket(ctx, "test", rapi.CreateBucketOptions{}); err != nil {
 		return nil, fmt.Errorf("failed to create bucket: %w", err)
 	}
