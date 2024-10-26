@@ -36,8 +36,12 @@ jobs:
           mkdir -p results
           CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
           git reset --hard 
-      - name: Run
-        run: ./bin/benchmark -output results
+      - name: Run RHP2
+        run: ./bin/benchmark -rhp2 -output results
+      - name: Run RHP3
+        run: ./bin/benchmark -rhp3 -output results
+      - name: Run e2e
+        run: ./bin/benchmark -e2e -output results
       - name: Add Result
         uses: peter-evans/create-pull-request@v7
         id: result
