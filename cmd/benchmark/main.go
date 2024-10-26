@@ -130,9 +130,9 @@ func main() {
 	flag.StringVar(&outputPath, "output", "results", "output directory for benchmark results")
 	flag.StringVar(&dir, "dir", "", "directory to store node data")
 	flag.StringVar(&logLevel, "log", "info", "logging level")
-	flag.BoolVar(&runRHP2, "rhp2", true, "run rhp2 benchmark")
-	flag.BoolVar(&runRHP3, "rhp3", true, "run rhp3 benchmark")
-	flag.BoolVar(&runE2E, "e2e", true, "run e2e benchmark")
+	flag.BoolVar(&runRHP2, "rhp2", false, "run rhp2 benchmark")
+	flag.BoolVar(&runRHP3, "rhp3", false, "run rhp3 benchmark")
+	flag.BoolVar(&runE2E, "e2e", false, "run e2e benchmark")
 	flag.Parse()
 
 	if err := os.MkdirAll(outputPath, 0755); err != nil {
