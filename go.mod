@@ -5,6 +5,8 @@ go 1.23.1
 toolchain go1.23.2
 
 require (
+	github.com/go-echarts/go-echarts/v2 v2.4.3
+	github.com/go-echarts/snapshot-chromedp v0.0.4
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.1-0.20241026073710-523c6e6df9cf
 	go.sia.tech/core v0.5.1-0.20241024182453-dae195401221
@@ -16,16 +18,24 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
+	github.com/chromedp/cdproto v0.0.0-20231011050154-1d073bb38998 // indirect
+	github.com/chromedp/chromedp v0.9.3 // indirect
+	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.107.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.3.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gotd/contrib v0.20.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/klauspost/reedsolomon v1.12.4 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
