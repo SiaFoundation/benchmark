@@ -130,22 +130,26 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		case <-time.After(5 * time.Second):
+		case <-time.After(15 * time.Second):
 		}
 
 		contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{ContractSet: "autopilot"})
 		if err != nil {
-			log.Panic("failed to get contracts", zap.Error(err))
+			return nil, fmt.Errorf("failed to get contracts: %w", err)
 		} else if len(contracts) >= hostCount {
 			break
 		}
-		log.Info("waiting for contracts", zap.Int("count", len(contracts)))
+
+		hosts, err := bus.Hosts(ctx, rapi.HostOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to get hosts: %w", err)
+		}
+
+		log.Info("waiting for contracts", zap.Int("contracts", len(contracts)), zap.Int("hosts", len(hosts)))
 		// bit of a hack to ensure the nodes end up in a good state during
 		// contract formation.
 		if err := nm.MineBlocks(ctx, 1, renterAddr); err != nil {
 			return nil, fmt.Errorf("failed to mine blocks: %w", err)
-		} else if _, err := autopilot.Trigger(true); err != nil {
-			return nil, fmt.Errorf("failed to trigger autopilot: %w", err)
 		}
 	}
 	return worker.NewClient(renter.APIAddress+"/api/worker", renter.Password), nil
@@ -211,7 +215,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	go s.Run(ctx)
 
 	// create a node manager
-	nm := nodes.NewManager(dir, cm, s, log.Named("cluster"))
+	nm := nodes.NewManager(dir, cm, s, nodes.WithLog(log.Named("cluster")), nodes.WithSharedConsensus(true))
 	defer nm.Close()
 
 	// setup the benchmark

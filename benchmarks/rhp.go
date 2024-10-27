@@ -249,7 +249,7 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	go s.Run(ctx)
 
 	// create a node manager
-	nm := nodes.NewManager(dir, cm, s, log.Named("cluster"))
+	nm := nodes.NewManager(dir, cm, s, nodes.WithLog(log.Named("cluster")), nodes.WithSharedConsensus(true))
 	defer nm.Close()
 
 	hostKey, renterKey := types.GeneratePrivateKey(), types.GeneratePrivateKey()
@@ -453,7 +453,7 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	go s.Run(ctx)
 
 	// create a node manager
-	nm := nodes.NewManager(dir, cm, s, log.Named("cluster"))
+	nm := nodes.NewManager(dir, cm, s, nodes.WithLog(log.Named("cluster")), nodes.WithSharedConsensus(true))
 	defer nm.Close()
 
 	hostKey, renterKey := types.GeneratePrivateKey(), types.GeneratePrivateKey()

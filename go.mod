@@ -4,11 +4,13 @@ go 1.23.1
 
 toolchain go1.23.2
 
+replace go.sia.tech/cluster => ../cluster
+
 require (
 	github.com/go-echarts/go-echarts/v2 v2.4.3
 	github.com/go-echarts/snapshot-chromedp v0.0.4
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.3-0.20241027203825-90cbd6c3b728
+	go.sia.tech/cluster v0.1.3-0.20241027215657-0f60c834739d
 	go.sia.tech/core v0.5.1-0.20241025171253-7fcde66168dd
 	go.sia.tech/coreutils v0.5.1-0.20241026175053-1d05f0ad93e6
 	go.sia.tech/renterd v1.1.0-beta.4.0.20241025151653-2b933326be16

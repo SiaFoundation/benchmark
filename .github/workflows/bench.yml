@@ -49,11 +49,7 @@ jobs:
       - name: Run RHP4
         run: ./bin/benchmark -rhp4 -output results
       - name: Run e2e
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 20
-          max_attempts: 3
-          command: ./bin/benchmark -e2e -output results
+        run: ./bin/benchmark -e2e -output results
       - name: Generate Charts
         run: go run ./cmd/chart -dir results
       - name: Add Results
