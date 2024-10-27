@@ -82,7 +82,7 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 		} else if err != nil {
 			return fmt.Errorf("failed to read record: %w", err)
 		}
-		version := normalizeGoVersion(record[4])
+		version := fmt.Sprintf("hostd %s", normalizeGoVersion(record[4]))
 		if uploadData[version] == nil {
 			versions = append(versions, version)
 		}
