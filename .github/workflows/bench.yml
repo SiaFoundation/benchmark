@@ -12,7 +12,7 @@ on:
         required: false
         default: 'dev'
   schedule:
-    - cron: '0 */8 * * *'
+    - cron: '0 */6 * * *'
 
 permissions:
   contents: write
