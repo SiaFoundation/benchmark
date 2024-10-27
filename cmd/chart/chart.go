@@ -55,7 +55,7 @@ func createBoxPlotData(data []float64) []float64 {
 func normalizeGoVersion(v string) string {
 	parts := strings.Split(v, "-")
 	if len(parts) == 3 {
-		return parts[2] // commit hash
+		return parts[2][:6] // commit hash
 	}
 	return v
 }
@@ -72,6 +72,7 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 		return fmt.Errorf("failed to read header: %w", err)
 	}
 
+	var os, arch, cpu string
 	var versions []string
 	uploadData := make(map[string][]float64)
 	downloadData := make(map[string][]float64)
@@ -82,6 +83,18 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 		} else if err != nil {
 			return fmt.Errorf("failed to read record: %w", err)
 		}
+
+		if os != "" && os != record[1] {
+			continue
+		} else if arch != "" && arch != record[2] {
+			continue
+		} else if cpu != "" && cpu != record[3] {
+			continue
+		}
+		os = record[1]
+		arch = record[2]
+		cpu = record[3]
+
 		version := fmt.Sprintf("hostd %s", normalizeGoVersion(record[4]))
 		if uploadData[version] == nil {
 			versions = append(versions, version)
@@ -112,11 +125,16 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 		})
 	}
 
+	if len(versions) > 10 {
+		versions = versions[len(versions)-10:]
+	}
+
 	bp := charts.NewBoxPlot()
 	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
 		Theme: "dark",
 	}), charts.WithTitleOpts(opts.Title{
-		Title: title,
+		Title:    title,
+		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
 	}), charts.WithAnimation(false))
 	bp.SetXAxis(versions).
 		AddSeries("Upload", uploadSeries).
@@ -137,6 +155,7 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 		return fmt.Errorf("failed to read header: %w", err)
 	}
 
+	var os, arch, cpu string
 	var versionPairs []string
 	uploadData := make(map[string][]float64)
 	downloadData := make(map[string][]float64)
@@ -147,8 +166,21 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 		} else if err != nil {
 			return fmt.Errorf("failed to read record: %w", err)
 		}
+
+		if os != "" && os != record[1] {
+			continue
+		} else if arch != "" && arch != record[2] {
+			continue
+		} else if cpu != "" && cpu != record[3] {
+			continue
+		}
+
+		os = record[1]
+		arch = record[2]
+		cpu = record[3]
+
 		hostdVersion, renterdVersion := normalizeGoVersion(record[4]), normalizeGoVersion(record[5])
-		versionPair := fmt.Sprintf("hostd %s / renterd %s", hostdVersion, renterdVersion)
+		versionPair := fmt.Sprintf("hostd %s\nrenterd %s", hostdVersion, renterdVersion)
 		if uploadData[versionPair] == nil {
 			versionPairs = append(versionPairs, versionPair)
 		}
@@ -164,6 +196,10 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 			return fmt.Errorf("failed to parse download speed: %w", err)
 		}
 		downloadData[versionPair] = append(downloadData[versionPair], downloadSpeed)
+	}
+
+	if len(versionPairs) > 10 {
+		versionPairs = versionPairs[len(versionPairs)-10:]
 	}
 
 	var uploadSeries, downloadSeries []opts.BoxPlotData
@@ -182,8 +218,14 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
 		Theme: "dark",
 	}), charts.WithTitleOpts(opts.Title{
-		Title: title,
-	}), charts.WithAnimation(false))
+		Title:    title,
+		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
+	}), charts.WithAnimation(false), charts.WithYAxisOpts(opts.YAxis{
+		AxisLabel: &opts.AxisLabel{
+			FontSize: 4,
+			Align:    "center",
+		},
+	}))
 	bp.SetXAxis(versionPairs).
 		AddSeries("Upload", uploadSeries).
 		AddSeries("Download", downloadSeries)
