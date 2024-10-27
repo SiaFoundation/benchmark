@@ -144,8 +144,8 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 	bp.SetXAxis(versions).
 		AddSeries("Upload", uploadSeries).
 		AddSeries("Download", downloadSeries)
-	render.MakeChartSnapshot(bp.RenderContent(), outputPath)
-	return nil
+
+	return render.MakeChartSnapshot(bp.RenderContent(), outputPath)
 }
 
 func generateE2EBox(title, inputPath, outputPath string) error {
@@ -234,6 +234,6 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 	bp.SetXAxis(versionPairs).
 		AddSeries("Upload", uploadSeries).
 		AddSeries("Download", downloadSeries)
-	render.MakeChartSnapshot(bp.RenderContent(), outputPath)
-	return nil
+
+	return render.MakeChartSnapshot(bp.RenderContent(), outputPath)
 }
