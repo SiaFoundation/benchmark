@@ -30,7 +30,7 @@ jobs:
       - name: Prepare
         env:
           HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version }}
-          RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version }}
+          RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'dev' }}
         run: |
           if [ -z "$HOSTD_UPDATE_TARGET" ]; then
             HOSTD_UPDATE_TARGET=$(git ls-remote https://github.com/siafoundation/hostd -q nate/rhp4 | awk '{print $1}')
