@@ -135,7 +135,12 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 	}), charts.WithTitleOpts(opts.Title{
 		Title:    title,
 		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
-	}), charts.WithAnimation(false))
+	}), charts.WithAnimation(false), charts.WithXAxisOpts(opts.XAxis{
+		AxisLabel: &opts.AxisLabel{
+			FontSize: 8,
+			Align:    "center",
+		},
+	}))
 	bp.SetXAxis(versions).
 		AddSeries("Upload", uploadSeries).
 		AddSeries("Download", downloadSeries)
@@ -220,9 +225,9 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 	}), charts.WithTitleOpts(opts.Title{
 		Title:    title,
 		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
-	}), charts.WithAnimation(false), charts.WithYAxisOpts(opts.YAxis{
+	}), charts.WithAnimation(false), charts.WithXAxisOpts(opts.XAxis{
 		AxisLabel: &opts.AxisLabel{
-			FontSize: 4,
+			FontSize: 8,
 			Align:    "center",
 		},
 	}))
