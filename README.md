@@ -47,5 +47,9 @@ The RHP4 benchmark is designed to test the performance of the RHP4 implementatio
 ## Usage
 
 ```
-./benchmark -hosts=50 -output=results
+./benchmark -e2e -output=results
 ```
+
+## TODO
+
+- [ ] Trigger benchmarks on PR merge in the hostd and renterd repos instead of on a schedule

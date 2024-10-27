@@ -21,7 +21,6 @@ permissions:
 jobs:
   benchmark:
     runs-on: linux-benchmark
-    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
