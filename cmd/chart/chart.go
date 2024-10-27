@@ -131,7 +131,8 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 
 	bp := charts.NewBoxPlot()
 	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
-		Theme: "dark",
+		Theme:           "dark",
+		BackgroundColor: "#0d1116",
 	}), charts.WithTitleOpts(opts.Title{
 		Title:    title,
 		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
@@ -221,7 +222,8 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 
 	bp := charts.NewBoxPlot()
 	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
-		Theme: "dark",
+		Theme:           "dark",
+		BackgroundColor: "#0d1116",
 	}), charts.WithTitleOpts(opts.Title{
 		Title:    title,
 		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
