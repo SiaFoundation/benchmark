@@ -4,8 +4,6 @@ go 1.23.1
 
 toolchain go1.23.2
 
-replace go.sia.tech/cluster => ../cluster
-
 require (
 	github.com/go-echarts/go-echarts/v2 v2.4.3
 	github.com/go-echarts/snapshot-chromedp v0.0.4
