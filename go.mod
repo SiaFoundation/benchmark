@@ -8,8 +8,8 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.4.3
 	github.com/go-echarts/snapshot-chromedp v0.0.4
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.1-0.20241026073710-523c6e6df9cf
-	go.sia.tech/core v0.5.1-0.20241024182453-dae195401221
+	go.sia.tech/cluster v0.1.3-0.20241027201756-96ebe251fa2f
+	go.sia.tech/core v0.5.1-0.20241025171253-7fcde66168dd
 	go.sia.tech/coreutils v0.5.1-0.20241026175053-1d05f0ad93e6
 	go.sia.tech/renterd v1.1.0-beta.4.0.20241025151653-2b933326be16
 	go.uber.org/zap v1.27.0
@@ -43,7 +43,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.sia.tech/gofakes3 v0.0.5 // indirect
-	go.sia.tech/hostd v1.1.3-0.20241026175749-46059e5e81cd // indirect
+	go.sia.tech/hostd v1.1.3-0.20241026181511-878994988c26 // indirect
 	go.sia.tech/jape v0.12.1 // indirect
 	go.sia.tech/mux v1.3.0 // indirect
 	go.sia.tech/walletd v0.8.1-0.20241021164545-5b34e523f8df // indirect
