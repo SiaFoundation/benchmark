@@ -1,18 +1,23 @@
 package main
 
 import (
+	"context"
 	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
+	"log"
+	"math"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/chromedp/chromedp"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"github.com/go-echarts/snapshot-chromedp/render"
 )
 
 func median(data []float64) float64 {
@@ -58,6 +63,69 @@ func normalizeGoVersion(v string) string {
 		return parts[2][:6] // commit hash
 	}
 	return v
+}
+
+func screenshot(ctx context.Context, chart *charts.BoxPlot, outputPath string) error {
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+
+	f, err := os.CreateTemp("", "screenshot-*.html")
+	if err != nil {
+		return fmt.Errorf("failed to create temp file: %w", err)
+	}
+	defer f.Close()
+	defer os.Remove(f.Name())
+
+	if err := chart.Render(f); err != nil {
+		return fmt.Errorf("failed to render chart: %w", err)
+	} else if err := f.Sync(); err != nil {
+		return fmt.Errorf("failed to close file: %w", err)
+	} else if err := f.Close(); err != nil {
+		return fmt.Errorf("failed to close file: %w", err)
+	}
+
+	tp, err := filepath.Abs(f.Name())
+	if err != nil {
+		return fmt.Errorf("failed to get absolute path: %w", err)
+	}
+
+	var ss []byte
+	err = chromedp.Run(ctx, chromedp.Tasks{
+		chromedp.EmulateViewport(1920, 1080),
+		chromedp.Navigate(`file://` + tp),
+		chromedp.ScreenshotScale("div.item", 2, &ss, chromedp.NodeVisible),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to take screenshot: %w", err)
+	}
+	return os.WriteFile(outputPath, ss, 0644)
+}
+
+func createBoxPlot(title, subtitle, outputPath string, versions []string, uploadSeries, downloadSeries []opts.BoxPlotData, ymin, ymax float64) error {
+	bp := charts.NewBoxPlot()
+	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
+		Theme:           "dark",
+		BackgroundColor: "#0d1116",
+		Renderer:        "svg",
+	}), charts.WithTitleOpts(opts.Title{
+		Title:    title,
+		Subtitle: subtitle,
+	}), charts.WithAnimation(false), charts.WithXAxisOpts(opts.XAxis{
+		AxisLabel: &opts.AxisLabel{
+			FontSize: 8,
+			Align:    "center",
+		},
+	}), charts.WithYAxisOpts(opts.YAxis{
+		Min: math.Round(ymin * 0.9),
+		Max: math.Round(ymax * 1.1),
+	}))
+	bp.SetXAxis(versions).
+		AddSeries("Upload", uploadSeries).
+		AddSeries("Download", downloadSeries)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	return screenshot(ctx, bp, outputPath)
 }
 
 func generateRHPBox(title, inputPath, outputPath string) error {
@@ -113,40 +181,33 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 		downloadData[version] = append(downloadData[version], downloadSpeed)
 	}
 
-	var uploadSeries, downloadSeries []opts.BoxPlotData
-	for _, version := range versions {
-		uploadSeries = append(uploadSeries, opts.BoxPlotData{
-			Name:  version,
-			Value: createBoxPlotData(uploadData[version]),
-		})
-		downloadSeries = append(downloadSeries, opts.BoxPlotData{
-			Name:  version,
-			Value: createBoxPlotData(downloadData[version]),
-		})
-	}
-
 	if len(versions) > 10 {
 		versions = versions[len(versions)-10:]
 	}
 
-	bp := charts.NewBoxPlot()
-	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
-		Theme:           "dark",
-		BackgroundColor: "#0d1116",
-	}), charts.WithTitleOpts(opts.Title{
-		Title:    title,
-		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
-	}), charts.WithAnimation(false), charts.WithXAxisOpts(opts.XAxis{
-		AxisLabel: &opts.AxisLabel{
-			FontSize: 8,
-			Align:    "center",
-		},
-	}))
-	bp.SetXAxis(versions).
-		AddSeries("Upload", uploadSeries).
-		AddSeries("Download", downloadSeries)
+	var cmin, cmax float64
+	var uploadSeries, downloadSeries []opts.BoxPlotData
+	for _, version := range versions {
+		uploadData, downloadData := uploadData[version], downloadData[version]
+		vmin := min(slices.Min(uploadData), slices.Min(downloadData))
+		vmax := max(slices.Max(uploadData), slices.Max(downloadData))
+		if cmin == 0 || vmin < cmin {
+			cmin = vmin
+		}
+		if vmax > cmax {
+			cmax = vmax
+		}
+		uploadSeries = append(uploadSeries, opts.BoxPlotData{
+			Name:  version,
+			Value: createBoxPlotData(uploadData),
+		})
+		downloadSeries = append(downloadSeries, opts.BoxPlotData{
+			Name:  version,
+			Value: createBoxPlotData(downloadData),
+		})
+	}
 
-	return render.MakeChartSnapshot(bp.RenderContent(), outputPath)
+	return createBoxPlot(title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versions, uploadSeries, downloadSeries, cmin, cmax)
 }
 
 func generateE2EBox(title, inputPath, outputPath string) error {
@@ -208,34 +269,29 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 		versionPairs = versionPairs[len(versionPairs)-10:]
 	}
 
+	var cmin, cmax float64
 	var uploadSeries, downloadSeries []opts.BoxPlotData
 	for _, version := range versionPairs {
+		uploadData, downloadData := uploadData[version], downloadData[version]
+		vmin := min(slices.Min(uploadData), slices.Min(downloadData))
+		vmax := max(slices.Max(uploadData), slices.Max(downloadData))
+		if cmin == 0 || vmin < cmin {
+			cmin = vmin
+		}
+		if vmax > cmax {
+			cmax = vmax
+		}
+
 		uploadSeries = append(uploadSeries, opts.BoxPlotData{
 			Name:  version,
-			Value: createBoxPlotData(uploadData[version]),
+			Value: createBoxPlotData(uploadData),
 		})
 		downloadSeries = append(downloadSeries, opts.BoxPlotData{
 			Name:  version,
-			Value: createBoxPlotData(downloadData[version]),
+			Value: createBoxPlotData(downloadData),
 		})
+		log.Println("upload", version, createBoxPlotData(uploadData))
+		log.Println("download", version, createBoxPlotData(downloadData))
 	}
-
-	bp := charts.NewBoxPlot()
-	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
-		Theme:           "dark",
-		BackgroundColor: "#0d1116",
-	}), charts.WithTitleOpts(opts.Title{
-		Title:    title,
-		Subtitle: fmt.Sprintf("%s (%s/%s)", cpu, os, arch),
-	}), charts.WithAnimation(false), charts.WithXAxisOpts(opts.XAxis{
-		AxisLabel: &opts.AxisLabel{
-			FontSize: 8,
-			Align:    "center",
-		},
-	}))
-	bp.SetXAxis(versionPairs).
-		AddSeries("Upload", uploadSeries).
-		AddSeries("Download", downloadSeries)
-
-	return render.MakeChartSnapshot(bp.RenderContent(), outputPath)
+	return createBoxPlot(title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versionPairs, uploadSeries, downloadSeries, cmin, cmax)
 }
