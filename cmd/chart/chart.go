@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -290,8 +289,6 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 			Name:  version,
 			Value: createBoxPlotData(downloadData),
 		})
-		log.Println("upload", version, createBoxPlotData(uploadData))
-		log.Println("download", version, createBoxPlotData(downloadData))
 	}
 	return createBoxPlot(title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versionPairs, uploadSeries, downloadSeries, cmin, cmax)
 }
