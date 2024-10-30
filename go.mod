@@ -8,10 +8,10 @@ require (
 	github.com/chromedp/chromedp v0.11.1
 	github.com/go-echarts/go-echarts/v2 v2.4.3
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.3-0.20241027215657-0f60c834739d
+	go.sia.tech/cluster v0.1.3-0.20241030170026-0d3c15a2e6b9
 	go.sia.tech/core v0.5.1-0.20241025171253-7fcde66168dd
 	go.sia.tech/coreutils v0.5.1-0.20241026175053-1d05f0ad93e6
-	go.sia.tech/renterd v1.1.0-beta.4.0.20241025151653-2b933326be16
+	go.sia.tech/renterd v1.1.0-beta.4.0.20241030143417-e4fe42de199d
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
@@ -21,7 +21,7 @@ require (
 	github.com/chromedp/cdproto v0.0.0-20241022234722-4d5d5faf59fb // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.107.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.4.0 // indirect
