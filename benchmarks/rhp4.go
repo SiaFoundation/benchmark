@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"path/filepath"
@@ -48,23 +47,6 @@ func (fs *fundAndSign) PublicKey() types.PublicKey {
 }
 func (fs *fundAndSign) Address() types.Address {
 	return fs.w.Address()
-}
-
-type readerLen struct {
-	r      io.Reader
-	length int
-}
-
-func NewReaderLen(buf []byte) rhp4.ReaderLen {
-	return &readerLen{r: bytes.NewReader(buf), length: len(buf)}
-}
-
-func (r *readerLen) Len() (int, error) {
-	return r.length, nil
-}
-
-func (r *readerLen) Read(p []byte) (int, error) {
-	return r.r.Read(p)
 }
 
 // helper to get the last host announcement. Scans the whole chain. Should only
@@ -233,7 +215,7 @@ func RHP4(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		frand.Read(sector[:])
 
 		start := time.Now()
-		result, err := rhp4.RPCWriteSector(ctx, transport, settings.Prices, at, NewReaderLen(sector[:]), 10)
+		result, err := rhp4.RPCWriteSector(ctx, transport, settings.Prices, at, bytes.NewReader(sector[:]), proto4.SectorSize, 10)
 		if err != nil {
 			return RHPResult{}, fmt.Errorf("failed to append sector %d: %w", i, err)
 		}
