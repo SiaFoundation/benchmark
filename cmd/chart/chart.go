@@ -12,6 +12,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/chromedp/chromedp"
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -88,6 +89,7 @@ func screenshot(ctx context.Context, chart *charts.BoxPlot, outputPath string) e
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.EmulateViewport(1920, 1080),
 		chromedp.Navigate(`file://` + tp),
+		chromedp.Sleep(time.Second),
 		chromedp.ScreenshotScale("div.item", 2, &ss, chromedp.NodeVisible),
 	})
 	if err != nil {
