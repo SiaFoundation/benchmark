@@ -12,7 +12,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/chromedp/chromedp"
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -65,9 +64,6 @@ func normalizeGoVersion(v string) string {
 }
 
 func screenshot(ctx context.Context, chart *charts.BoxPlot, outputPath string) error {
-	ctx, cancel := chromedp.NewContext(context.Background())
-	defer cancel()
-
 	f, err := os.CreateTemp("", "screenshot-*.html")
 	if err != nil {
 		return fmt.Errorf("failed to create temp file: %w", err)
@@ -100,7 +96,7 @@ func screenshot(ctx context.Context, chart *charts.BoxPlot, outputPath string) e
 	return os.WriteFile(outputPath, ss, 0644)
 }
 
-func createBoxPlot(title, subtitle, outputPath string, versions []string, uploadSeries, downloadSeries []opts.BoxPlotData, ymin, ymax float64) error {
+func createBoxPlot(ctx context.Context, title, subtitle, outputPath string, versions []string, uploadSeries, downloadSeries []opts.BoxPlotData, ymin, ymax float64) error {
 	bp := charts.NewBoxPlot()
 	bp.SetGlobalOptions(charts.WithInitializationOpts(opts.Initialization{
 		Theme:           "dark",
@@ -122,12 +118,10 @@ func createBoxPlot(title, subtitle, outputPath string, versions []string, upload
 		AddSeries("Upload", uploadSeries).
 		AddSeries("Download", downloadSeries)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 	return screenshot(ctx, bp, outputPath)
 }
 
-func generateRHPBox(title, inputPath, outputPath string) error {
+func generateRHPBox(ctx context.Context, title, inputPath, outputPath string) error {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
@@ -206,10 +200,10 @@ func generateRHPBox(title, inputPath, outputPath string) error {
 		})
 	}
 
-	return createBoxPlot(title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versions, uploadSeries, downloadSeries, cmin, cmax)
+	return createBoxPlot(ctx, title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versions, uploadSeries, downloadSeries, cmin, cmax)
 }
 
-func generateE2EBox(title, inputPath, outputPath string) error {
+func generateE2EBox(ctx context.Context, title, inputPath, outputPath string) error {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
@@ -290,5 +284,5 @@ func generateE2EBox(title, inputPath, outputPath string) error {
 			Value: createBoxPlotData(downloadData),
 		})
 	}
-	return createBoxPlot(title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versionPairs, uploadSeries, downloadSeries, cmin, cmax)
+	return createBoxPlot(ctx, title, fmt.Sprintf("%s (%s/%s)", cpu, os, arch), outputPath, versionPairs, uploadSeries, downloadSeries, cmin, cmax)
 }

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"path/filepath"
+
+	"github.com/chromedp/chromedp"
 )
 
 func main() {
@@ -11,16 +14,19 @@ func main() {
 	flag.StringVar(&resultsDir, "dir", "results", "results directory")
 	flag.Parse()
 
-	if err := generateRHPBox("RHP2", filepath.Join(resultsDir, "rhp2.csv"), filepath.Join(resultsDir, "rhp2.png")); err != nil {
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+
+	if err := generateRHPBox(ctx, "RHP2", filepath.Join(resultsDir, "rhp2.csv"), filepath.Join(resultsDir, "rhp2.png")); err != nil {
 		panic(err)
 	}
-	if err := generateRHPBox("RHP3", filepath.Join(resultsDir, "rhp3.csv"), filepath.Join(resultsDir, "rhp3.png")); err != nil {
+	if err := generateRHPBox(ctx, "RHP3", filepath.Join(resultsDir, "rhp3.csv"), filepath.Join(resultsDir, "rhp3.png")); err != nil {
 		panic(err)
 	}
-	if err := generateRHPBox("RHP4", filepath.Join(resultsDir, "rhp4.csv"), filepath.Join(resultsDir, "rhp4.png")); err != nil {
+	if err := generateRHPBox(ctx, "RHP4", filepath.Join(resultsDir, "rhp4.csv"), filepath.Join(resultsDir, "rhp4.png")); err != nil {
 		panic(err)
 	}
-	if err := generateE2EBox("End to End", filepath.Join(resultsDir, "e2e.csv"), filepath.Join(resultsDir, "e2e.png")); err != nil {
+	if err := generateE2EBox(ctx, "End to End", filepath.Join(resultsDir, "e2e.csv"), filepath.Join(resultsDir, "e2e.png")); err != nil {
 		panic(err)
 	}
 }
