@@ -49,8 +49,6 @@ jobs:
         run: ./bin/benchmark -rhp4 -output results
       - name: Run e2e
         run: ./bin/benchmark -e2e -output results
-      - name: Generate Charts
-        run: go run ./cmd/chart -dir results
       - name: Add Results
         uses: peter-evans/create-pull-request@v7
         id: result
