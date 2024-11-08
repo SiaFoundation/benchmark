@@ -8,10 +8,10 @@ require (
 	github.com/chromedp/chromedp v0.11.1
 	github.com/go-echarts/go-echarts/v2 v2.4.4
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.3-0.20241101222420-60461e5e80bc
+	go.sia.tech/cluster v0.1.3-0.20241108192402-8dc0b91c8d8c
 	go.sia.tech/core v0.6.1
 	go.sia.tech/coreutils v0.6.0
-	go.sia.tech/renterd v1.1.0-beta.4.0.20241101220719-9f67518242e8
+	go.sia.tech/renterd v1.1.0-beta.5.0.20241108111642-4b0f42a3d24f
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
