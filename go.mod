@@ -5,8 +5,8 @@ go 1.23.1
 toolchain go1.23.2
 
 require (
-	github.com/chromedp/chromedp v0.11.1
-	github.com/go-echarts/go-echarts/v2 v2.4.4
+	github.com/chromedp/chromedp v0.11.2
+	github.com/go-echarts/go-echarts/v2 v2.4.5
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20241108192402-8dc0b91c8d8c
 	go.sia.tech/core v0.6.1
