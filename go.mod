@@ -9,9 +9,9 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.4.5
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20241108192402-8dc0b91c8d8c
-	go.sia.tech/core v0.6.2
+	go.sia.tech/core v0.7.1
 	go.sia.tech/coreutils v0.7.0
-	go.sia.tech/renterd v1.1.0-beta.5.0.20241108111642-4b0f42a3d24f
+	go.sia.tech/renterd v1.1.0
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
@@ -20,7 +20,7 @@ require (
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
 	github.com/chromedp/cdproto v0.0.0-20241022234722-4d5d5faf59fb // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
-	github.com/cloudflare/cloudflare-go v0.107.0 // indirect
+	github.com/cloudflare/cloudflare-go v0.109.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.sia.tech/gofakes3 v0.0.5 // indirect
-	go.sia.tech/hostd v1.1.3-0.20241101192444-1058cfa70082 // indirect
+	go.sia.tech/hostd v1.1.3-0.20241118221702-bd91bb9688a2 // indirect
 	go.sia.tech/jape v0.12.1 // indirect
 	go.sia.tech/mux v1.3.0 // indirect
 	go.sia.tech/walletd v0.8.1-0.20241101091153-465e9da22d82 // indirect
@@ -51,6 +51,7 @@ require (
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
-	golang.org/x/time v0.7.0 // indirect
+	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
+	nhooyr.io/websocket v1.8.17 // indirect
 )
