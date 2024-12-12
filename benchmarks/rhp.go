@@ -175,7 +175,7 @@ func setupRHPBenchmark(ctx context.Context, nm *nodes.Manager, log *zap.Logger) 
 		case <-time.After(5 * time.Second):
 		}
 
-		contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{ContractSet: "autopilot"})
+		contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{})
 		if err != nil {
 			return nil, types.PrivateKey{}, fmt.Errorf("failed to get contracts: %w", err)
 		} else if len(contracts) > 0 {
@@ -237,7 +237,7 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	defer syncerListener.Close()
 
 	_, port, err := net.SplitHostPort(syncerListener.Addr().String())
-	s := syncer.New(syncerListener, cm, testutil.NewMemPeerStore(), gateway.Header{
+	s := syncer.New(syncerListener, cm, testutil.NewEphemeralPeerStore(), gateway.Header{
 		GenesisID:  genesis.ID(),
 		UniqueID:   gateway.GenerateUniqueID(),
 		NetAddress: "127.0.0.1:" + port,
@@ -441,7 +441,7 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	defer syncerListener.Close()
 
 	_, port, err := net.SplitHostPort(syncerListener.Addr().String())
-	s := syncer.New(syncerListener, cm, testutil.NewMemPeerStore(), gateway.Header{
+	s := syncer.New(syncerListener, cm, testutil.NewEphemeralPeerStore(), gateway.Header{
 		GenesisID:  genesis.ID(),
 		UniqueID:   gateway.GenerateUniqueID(),
 		NetAddress: "127.0.0.1:" + port,

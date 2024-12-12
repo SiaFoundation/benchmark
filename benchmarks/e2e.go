@@ -82,21 +82,26 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 
 	// setup the renter
 	renter := nm.Renterd()[0]
+	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
+
 	autopilot := autopilot.NewClient(renter.APIAddress+"/api/autopilot", renter.Password)
-	autopilotCfg, err := autopilot.Config()
+	autopilotCfg, err := bus.AutopilotConfig(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get autopilot config: %w", err)
 	}
 	// set the contract count to match the number of hosts
 	autopilotCfg.Contracts.Amount = uint64(hostCount)
-	if err := autopilot.UpdateConfig(autopilotCfg); err != nil {
+	err = bus.UpdateAutopilotConfig(ctx, func(req *rapi.UpdateAutopilotRequest) {
+		enabled := true
+		req.Enabled = &enabled
+		req.Contracts = &autopilotCfg.Contracts
+		req.Contracts.Amount = uint64(hostCount)
+	})
+	if err != nil {
 		return nil, fmt.Errorf("failed to update autopilot config: %w", err)
 	}
 
-	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
-
 	err = bus.UpdateUploadSettings(ctx, rapi.UploadSettings{
-		DefaultContractSet: "autopilot",
 		Packing: rapi.UploadPackingSettings{
 			Enabled: false,
 		},
@@ -133,7 +138,7 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 		case <-time.After(15 * time.Second):
 		}
 
-		contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{ContractSet: "autopilot"})
+		contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get contracts: %w", err)
 		} else if len(contracts) >= hostCount {
@@ -203,7 +208,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	defer syncerListener.Close()
 
 	_, port, err := net.SplitHostPort(syncerListener.Addr().String())
-	s := syncer.New(syncerListener, cm, testutil.NewMemPeerStore(), gateway.Header{
+	s := syncer.New(syncerListener, cm, testutil.NewEphemeralPeerStore(), gateway.Header{
 		GenesisID:  genesis.ID(),
 		UniqueID:   gateway.GenerateUniqueID(),
 		NetAddress: "127.0.0.1:" + port,

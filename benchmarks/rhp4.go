@@ -122,7 +122,7 @@ func RHP4(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	defer syncerListener.Close()
 
 	_, port, err := net.SplitHostPort(syncerListener.Addr().String())
-	s := syncer.New(syncerListener, cm, testutil.NewMemPeerStore(), gateway.Header{
+	s := syncer.New(syncerListener, cm, testutil.NewEphemeralPeerStore(), gateway.Header{
 		GenesisID:  genesis.ID(),
 		UniqueID:   gateway.GenerateUniqueID(),
 		NetAddress: "127.0.0.1:" + port,
@@ -215,7 +215,7 @@ func RHP4(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 		frand.Read(sector[:])
 
 		start := time.Now()
-		result, err := rhp4.RPCWriteSector(ctx, transport, settings.Prices, at, bytes.NewReader(sector[:]), proto4.SectorSize, 10)
+		result, err := rhp4.RPCWriteSector(ctx, transport, settings.Prices, at, bytes.NewReader(sector[:]), proto4.SectorSize)
 		if err != nil {
 			return RHPResult{}, fmt.Errorf("failed to append sector %d: %w", i, err)
 		}

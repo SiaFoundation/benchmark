@@ -6,18 +6,18 @@ on:
       hostd-version:
         description: hostd commit hash or branch name to use
         required: false
-        default: ''
+        default: "master"
       renterd-version:
         description: renterd commit hash or branch name to use
         required: false
-        default: 'dev'
+        default: "dev"
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: "0 */3 * * *"
 
 permissions:
   contents: write
   pull-requests: write
-  
+
 jobs:
   benchmark:
     runs-on: linux-benchmark
@@ -31,16 +31,13 @@ jobs:
           HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version }}
           RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'dev' }}
         run: |
-          if [ -z "$HOSTD_UPDATE_TARGET" ]; then
-            HOSTD_UPDATE_TARGET=$(git ls-remote https://github.com/siafoundation/hostd -q nate/rhp4 | awk '{print $1}')
-          fi
           go get go.sia.tech/hostd@$HOSTD_UPDATE_TARGET
           go get go.sia.tech/renterd@$RENTERD_UPDATE_TARGET
           go mod tidy
 
           mkdir -p results
           CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
-          git reset --hard 
+          git reset --hard
       - name: Run RHP2
         run: ./bin/benchmark -rhp2 -output results
       - name: Run RHP3
@@ -49,7 +46,7 @@ jobs:
         run: ./bin/benchmark -rhp4 -output results
       - name: Run e2e
         run: ./bin/benchmark -e2e -output results
-      - name: Generate Charts 
+      - name: Generate Charts
         continue-on-error: true # chromedp is unreliable in CI
         run: go run ./cmd/chart -dir results
       - name: Add Results
@@ -69,8 +66,3 @@ jobs:
         run: gh pr merge --merge --auto "${{ steps.result.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          
-        
-          
-      
