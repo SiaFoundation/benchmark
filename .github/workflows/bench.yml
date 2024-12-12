@@ -30,6 +30,7 @@ jobs:
         env:
           HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version }}
           RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'dev' }}
+          GOPRIVATE: go.sia.tech # force lookups
         run: |
           go get go.sia.tech/hostd@$HOSTD_UPDATE_TARGET
           go get go.sia.tech/renterd@$RENTERD_UPDATE_TARGET
