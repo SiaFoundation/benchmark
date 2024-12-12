@@ -9,7 +9,7 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.4.5
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20241212220513-8d4e2ad6883d
-	go.sia.tech/core v0.7.2-0.20241210224920-0534a5928ddb
+	go.sia.tech/core v0.7.3
 	go.sia.tech/coreutils v0.7.1-0.20241211045514-6881993d8806
 	go.sia.tech/renterd v1.1.1-0.20241212160145-9b05f245be23
 	go.uber.org/zap v1.27.0
