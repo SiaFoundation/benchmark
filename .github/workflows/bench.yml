@@ -28,7 +28,7 @@ jobs:
           go-version: stable
       - name: Prepare
         env:
-          HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version }}
+          HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version || 'master' }}
           RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'dev' }}
           GOPRIVATE: go.sia.tech # force lookups
         run: |
