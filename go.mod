@@ -8,10 +8,10 @@ require (
 	github.com/chromedp/chromedp v0.11.2
 	github.com/go-echarts/go-echarts/v2 v2.4.5
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.3-0.20241212220513-8d4e2ad6883d
-	go.sia.tech/core v0.7.4-0.20241212155227-c36fa2aec558
-	go.sia.tech/coreutils v0.7.1-0.20241212095636-85dd0252d9ad
-	go.sia.tech/renterd v1.1.1-0.20241212160145-9b05f245be23
+	go.sia.tech/cluster v0.1.3-0.20241218214456-7cfd2a94ddc2
+	go.sia.tech/core v0.9.0
+	go.sia.tech/coreutils v0.8.1-0.20241218181949-43f6ab81acde
+	go.sia.tech/renterd v1.1.1-0.20241218130411-9780497f1861
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
@@ -42,10 +42,10 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.sia.tech/gofakes3 v0.0.5 // indirect
-	go.sia.tech/hostd v1.1.3-0.20241212215223-9e3440475bed // indirect
+	go.sia.tech/hostd v1.1.3-0.20241218083322-ae9c8a971fe0 // indirect
 	go.sia.tech/jape v0.12.1 // indirect
 	go.sia.tech/mux v1.3.0 // indirect
-	go.sia.tech/walletd v0.8.1-0.20241210081245-ca3d83da2781 // indirect
+	go.sia.tech/walletd v0.8.1-0.20241217084958-e4f5880d4d06 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
