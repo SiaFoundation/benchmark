@@ -6,12 +6,12 @@ toolchain go1.23.2
 
 require (
 	github.com/chromedp/chromedp v0.11.2
-	github.com/go-echarts/go-echarts/v2 v2.4.5
+	github.com/go-echarts/go-echarts/v2 v2.4.6
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20241218214456-7cfd2a94ddc2
 	go.sia.tech/core v0.9.0
-	go.sia.tech/coreutils v0.8.1-0.20241218181949-43f6ab81acde
-	go.sia.tech/renterd v1.1.1-0.20241218130411-9780497f1861
+	go.sia.tech/coreutils v0.9.0
+	go.sia.tech/renterd v1.1.1
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
