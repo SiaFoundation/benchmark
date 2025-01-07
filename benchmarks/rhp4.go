@@ -202,12 +202,7 @@ func RHP4(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	revision.Revision = fundResult.Revision
 
 	log.Info("starting upload")
-	at := proto4.AccountToken{
-		Account:    accountID,
-		ValidUntil: time.Now().Add(5 * time.Minute),
-	}
-	at.Signature = renterKey.SignHash(at.SigHash())
-
+	at := accountID.Token(renterKey, hostKey.PublicKey())
 	appendTimes := make([]time.Duration, benchmarkSectors)
 	roots := make([]types.Hash256, benchmarkSectors)
 	for i := range benchmarkSectors {
