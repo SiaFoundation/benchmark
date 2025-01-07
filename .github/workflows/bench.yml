@@ -10,7 +10,7 @@ on:
       renterd-version:
         description: renterd commit hash or branch name to use
         required: false
-        default: "dev"
+        default: "master"
   schedule:
     - cron: "0 */3 * * *"
 
@@ -29,7 +29,7 @@ jobs:
       - name: Prepare
         env:
           HOSTD_UPDATE_TARGET: ${{ github.event.inputs.hostd-version || 'master' }}
-          RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'dev' }}
+          RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'master' }}
           GOPRIVATE: go.sia.tech # force lookups
         run: |
           go get go.sia.tech/hostd@$HOSTD_UPDATE_TARGET
