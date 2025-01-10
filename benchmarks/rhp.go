@@ -21,9 +21,6 @@ import (
 	"go.sia.tech/coreutils/syncer"
 	"go.sia.tech/coreutils/testutil"
 	"go.sia.tech/coreutils/wallet"
-	rapi "go.sia.tech/renterd/api"
-	"go.sia.tech/renterd/autopilot"
-	"go.sia.tech/renterd/bus"
 	"go.uber.org/zap"
 	"lukechampine.com/frand"
 )
@@ -121,74 +118,6 @@ func findHostAnnouncement(cm *chain.Manager, sk types.PrivateKey) (address strin
 			index = cau.State.Index
 		}
 	}
-}
-
-// setupRHPBenchmark creates a testnet with a single host and renter node
-func setupRHPBenchmark(ctx context.Context, nm *nodes.Manager, log *zap.Logger) (*bus.Client, types.PrivateKey, error) {
-	// start the host and renter
-	ready := make(chan struct{}, 1)
-	go func() {
-		// started in a goroutine to avoid blocking
-		if err := nm.StartHostd(ctx, types.GeneratePrivateKey(), ready); err != nil {
-			log.Panic("hostd failed to start", zap.Error(err))
-		}
-	}()
-	select {
-	case <-ctx.Done():
-		return nil, types.PrivateKey{}, ctx.Err()
-	case <-ready:
-	}
-
-	sk := types.GeneratePrivateKey()
-	go func() {
-		// started in a goroutine to avoid blocking
-		if err := nm.StartRenterd(ctx, sk, ready); err != nil {
-			log.Panic("renterd failed to start", zap.Error(err))
-		}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil, types.PrivateKey{}, ctx.Err()
-	case <-ready:
-	}
-
-	// mine until all payouts have matured
-	if err := nm.MineBlocks(ctx, 10, types.VoidAddress); err != nil {
-		return nil, types.PrivateKey{}, fmt.Errorf("failed to mine blocks: %w", err)
-	}
-
-	// setup the renter
-	renter := nm.Renterd()[0]
-	autopilot := autopilot.NewClient(renter.APIAddress+"/api/autopilot", renter.Password)
-	// trigger autopilot
-	if _, err := autopilot.Trigger(true); err != nil {
-		return nil, types.PrivateKey{}, fmt.Errorf("failed to trigger autopilot: %w", err)
-	}
-
-	// wait for a contract with the host to form
-	bus := bus.NewClient(renter.APIAddress+"/api/bus", renter.Password)
-	for i := 0; i < 100; i++ {
-		select {
-		case <-ctx.Done():
-			return nil, types.PrivateKey{}, ctx.Err()
-		case <-time.After(5 * time.Second):
-		}
-
-		contracts, err := bus.Contracts(ctx, rapi.ContractsOpts{})
-		if err != nil {
-			return nil, types.PrivateKey{}, fmt.Errorf("failed to get contracts: %w", err)
-		} else if len(contracts) > 0 {
-			break
-		}
-		log.Info("waiting for contracts", zap.Int("count", len(contracts)))
-		// bit of a hack to ensure the nodes end up in a good state during
-		// contract formation.
-		if err := nm.MineBlocks(ctx, 1, types.VoidAddress); err != nil {
-			return nil, types.PrivateKey{}, fmt.Errorf("failed to mine blocks: %w", err)
-		}
-	}
-	return bus, sk, nil
 }
 
 func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
