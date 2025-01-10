@@ -8,10 +8,10 @@ require (
 	github.com/chromedp/chromedp v0.11.2
 	github.com/go-echarts/go-echarts/v2 v2.4.6
 	github.com/klauspost/cpuid v1.3.1
-	go.sia.tech/cluster v0.1.3-0.20250107161602-95b18eab1f27
+	go.sia.tech/cluster v0.1.3-0.20250110150831-166fabf97b5e
 	go.sia.tech/core v0.9.0
 	go.sia.tech/coreutils v0.9.0
-	go.sia.tech/renterd v1.1.2-0.20250107100854-595eedd003ca
+	go.sia.tech/renterd v1.1.2-0.20250110150645-51a18d21b9ff
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
@@ -42,7 +42,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
 	go.sia.tech/gofakes3 v0.0.5 // indirect
-	go.sia.tech/hostd v1.1.3-0.20250107045637-02030327f2a0 // indirect
+	go.sia.tech/hostd v1.1.3-0.20250109165545-49c373fa1c46 // indirect
 	go.sia.tech/jape v0.12.1 // indirect
 	go.sia.tech/mux v1.3.0 // indirect
 	go.sia.tech/walletd v0.9.0-beta.1.0.20250107110631-6c40e2b694ed // indirect
