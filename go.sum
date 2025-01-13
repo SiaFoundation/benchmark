@@ -77,8 +77,8 @@ go.sia.tech/cluster v0.1.3-0.20250110150831-166fabf97b5e h1:bVytg5LsJtlBq7ISWA4d
 go.sia.tech/cluster v0.1.3-0.20250110150831-166fabf97b5e/go.mod h1:NvY+eWsT4OPn2SvySlMmE/qHIeLV5GS3hCQHG5R89cQ=
 go.sia.tech/core v0.9.0 h1:qV7V8nkNaPvBEhkbwgrETTkb7JCMcAnKUQt9nUumP4k=
 go.sia.tech/core v0.9.0/go.mod h1:3NAvYHuzAZg9vP6pyIMOxjTkgHBQ3vx9cXTqRF6oEa4=
-go.sia.tech/coreutils v0.9.0 h1:5cnK0RtHOyErGhcmNkmCdEKeuj1tECwO9PYbErEbpDQ=
-go.sia.tech/coreutils v0.9.0/go.mod h1:KFq1q5/YbPH6ZSWtXCxA1bRhBF5Zgcj8G3Wvu0jr/BA=
+go.sia.tech/coreutils v0.9.1 h1:2SukWrF9o18HIG+BNmNk4SZw48+h+cM0gR8jMtG2cQ4=
+go.sia.tech/coreutils v0.9.1/go.mod h1:A/tNYSBdryxCFaIpvW04YvdQ4e2j8iGuHoIw70+ZYXc=
 go.sia.tech/gofakes3 v0.0.5 h1:vFhVBUFbKE9ZplvLE2w4TQxFMQyF8qvgxV4TaTph+Vw=
 go.sia.tech/gofakes3 v0.0.5/go.mod h1:LXEzwGw+OHysWLmagleCttX93cJZlT9rBu/icOZjQ54=
 go.sia.tech/hostd v1.1.3-0.20250109165545-49c373fa1c46 h1:NbPekcRMZS3GbGZLZTpC/DwEMjtbuX1xGwh+lYJu+o0=

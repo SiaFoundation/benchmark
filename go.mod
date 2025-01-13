@@ -10,7 +10,7 @@ require (
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20250110150831-166fabf97b5e
 	go.sia.tech/core v0.9.0
-	go.sia.tech/coreutils v0.9.0
+	go.sia.tech/coreutils v0.9.1
 	go.sia.tech/renterd v1.1.2-0.20250110150645-51a18d21b9ff
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
