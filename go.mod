@@ -9,8 +9,8 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.4.6
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20250110150831-166fabf97b5e
-	go.sia.tech/core v0.9.0
-	go.sia.tech/coreutils v0.9.0
+	go.sia.tech/core v0.9.1
+	go.sia.tech/coreutils v0.10.1
 	go.sia.tech/renterd v1.1.2-0.20250110150645-51a18d21b9ff
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
@@ -47,7 +47,7 @@ require (
 	go.sia.tech/mux v1.3.0 // indirect
 	go.sia.tech/walletd v0.9.0-beta.1.0.20250107110631-6c40e2b694ed // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
