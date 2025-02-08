@@ -217,7 +217,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 		return E2EResult{}, fmt.Errorf("failed to create syncer: %w", err)
 	}
 	defer s.Close()
-	go s.Run(ctx)
+	go s.Run()
 
 	// create a node manager
 	nm := nodes.NewManager(dir, cm, s, nodes.WithLog(log.Named("cluster")), nodes.WithSharedConsensus(true))
