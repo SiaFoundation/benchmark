@@ -122,10 +122,11 @@ func main() {
 		dir        string
 		logLevel   string
 
-		runRHP2 bool
-		runRHP3 bool
-		runRHP4 bool
-		runE2E  bool
+		runRHP2     bool
+		runRHP3     bool
+		runRHP4     bool
+		runRHP4Quic bool
+		runE2E      bool
 	)
 
 	flag.StringVar(&outputPath, "output", "results", "output directory for benchmark results")
@@ -133,7 +134,8 @@ func main() {
 	flag.StringVar(&logLevel, "log", "info", "logging level")
 	flag.BoolVar(&runRHP2, "rhp2", false, "run rhp2 benchmark")
 	flag.BoolVar(&runRHP3, "rhp3", false, "run rhp3 benchmark")
-	flag.BoolVar(&runRHP4, "rhp4", false, "run rhp4 benchmark")
+	flag.BoolVar(&runRHP4, "rhp4", false, "run rhp4 SiaMux benchmark")
+	flag.BoolVar(&runRHP4Quic, "rhp4.quic", false, "run rhp4 QUIC benchmark")
 	flag.BoolVar(&runE2E, "e2e", false, "run e2e benchmark")
 	flag.Parse()
 
@@ -212,6 +214,14 @@ func main() {
 		if rhp4, err := benchmarks.RHP4(ctx, dir, log.Named("rhp4")); err != nil {
 			log.Panic("failed to run rhp4 benchmark", zap.Error(err))
 		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp4.csv"), rhp4); err != nil {
+			log.Panic("failed to write rhp2 result", zap.Error(err))
+		}
+	}
+
+	if runRHP4Quic {
+		if rhp4, err := benchmarks.RHP4QUIC(ctx, dir, log.Named("rhp4.quic")); err != nil {
+			log.Panic("failed to run rhp4 QUIC benchmark", zap.Error(err))
+		} else if err := writeRHPResult(hostdVersion, filepath.Join(outputPath, "rhp4.quic.csv"), rhp4); err != nil {
 			log.Panic("failed to write rhp2 result", zap.Error(err))
 		}
 	}
