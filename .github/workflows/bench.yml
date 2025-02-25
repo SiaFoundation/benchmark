@@ -43,8 +43,10 @@ jobs:
         run: ./bin/benchmark -rhp2 -output results
       - name: Run RHP3
         run: ./bin/benchmark -rhp3 -output results
-      - name: Run RHP4
+      - name: Run RHP4 - SiaMux
         run: ./bin/benchmark -rhp4 -output results
+      - name: Run RHP4 - QUIC
+        run: ./bin/benchmark -rhp4 -rhp4.quic -output results
       - name: Run e2e
         run: ./bin/benchmark -e2e -output results
       - name: Generate Charts

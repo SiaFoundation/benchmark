@@ -40,9 +40,17 @@ The RHP4 benchmark is designed to test the performance of the RHP4 implementatio
 
 *RHP4 is still in development and not available on Mainnet yet*
 
+#### SiaMux
+
 ![RHP4 Results](results/rhp4.png)
 
 [Results](results/rhp4.csv)
+
+#### QUIC
+
+![RHP4 Quic Results](results/rhp4.quic.png)
+
+[Results](results/rhp4.quic.csv)
 
 ## Usage
 
