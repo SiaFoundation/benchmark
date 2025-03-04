@@ -462,3 +462,5 @@ Timestamp,OS,Arch,CPU,hostd Version,Upload Speed,Download Speed,Append Sector P9
 2025-03-04T09:08:00Z,linux,amd64,AMD EPYC 7763 64-Core Processor,v1.1.3-0.20250228194313-d3dea27df190,1542.3310 Mbps,2423.4586 Mbps,25 ms,15 ms,3 ms
 2025-03-04T12:10:17Z,linux,amd64,AMD EPYC 7763 64-Core Processor,v1.1.3-0.20250304092217-a3cdd084afd5,1509.6110 Mbps,2110.4873 Mbps,25 ms,18 ms,2 ms
 2025-03-04T12:10:43Z,linux,amd64,AMD EPYC 7763 64-Core Processor,v1.1.3-0.20250304092217-a3cdd084afd5,1513.6841 Mbps,2115.5477 Mbps,26 ms,19 ms,2 ms
+2025-03-04T15:07:46Z,linux,amd64,AMD EPYC 7763 64-Core Processor,v1.1.3-0.20250304092217-a3cdd084afd5,1521.1851 Mbps,2091.8611 Mbps,25 ms,19 ms,2 ms
+2025-03-04T15:08:13Z,linux,amd64,AMD EPYC 7763 64-Core Processor,v1.1.3-0.20250304092217-a3cdd084afd5,1519.4723 Mbps,2108.5815 Mbps,25 ms,18 ms,2 ms
