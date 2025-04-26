@@ -152,7 +152,7 @@ func RHP2(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	defer bdb.Close()
 
 	n, genesis := benchmarkV1Network()
-	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis)
+	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis, nil)
 	if err != nil {
 		log.Panic("failed to create dbstore", zap.Error(err))
 	}
@@ -356,7 +356,7 @@ func RHP3(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	defer bdb.Close()
 
 	n, genesis := benchmarkV1Network()
-	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis)
+	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis, nil)
 	if err != nil {
 		log.Panic("failed to create dbstore", zap.Error(err))
 	}

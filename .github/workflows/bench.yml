@@ -32,8 +32,8 @@ jobs:
           RENTERD_UPDATE_TARGET: ${{ github.event.inputs.renterd-version || 'master' }}
           GOPRIVATE: go.sia.tech # force lookups
         run: |
-          go get go.sia.tech/hostd@$HOSTD_UPDATE_TARGET
-          go get go.sia.tech/renterd@$RENTERD_UPDATE_TARGET
+          go get go.sia.tech/hostd/v2@$HOSTD_UPDATE_TARGET
+          go get go.sia.tech/renterd/v2@$RENTERD_UPDATE_TARGET
           go mod tidy
 
           mkdir -p results
