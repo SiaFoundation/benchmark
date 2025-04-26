@@ -154,9 +154,9 @@ func main() {
 		switch {
 		case dep == nil:
 			continue
-		case dep.Path == "go.sia.tech/hostd":
+		case dep.Path == "go.sia.tech/hostd/v2":
 			hostdVersion = dep.Version
-		case dep.Path == "go.sia.tech/renterd":
+		case dep.Path == "go.sia.tech/renterd/v2":
 			renterdVersion = dep.Version
 		}
 	}

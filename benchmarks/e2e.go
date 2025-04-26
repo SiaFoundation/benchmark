@@ -18,10 +18,11 @@ import (
 	"go.sia.tech/coreutils/chain"
 	"go.sia.tech/coreutils/syncer"
 	"go.sia.tech/coreutils/testutil"
-	rapi "go.sia.tech/renterd/api"
-	"go.sia.tech/renterd/autopilot"
-	"go.sia.tech/renterd/bus"
-	"go.sia.tech/renterd/worker"
+	rapi "go.sia.tech/renterd/v2/api"
+	"go.sia.tech/renterd/v2/autopilot"
+	"go.sia.tech/renterd/v2/bus"
+	"go.sia.tech/renterd/v2/bus/client"
+	"go.sia.tech/renterd/v2/worker"
 	"go.uber.org/zap"
 	"lukechampine.com/frand"
 )
@@ -91,12 +92,9 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 	}
 	// set the contract count to match the number of hosts
 	autopilotCfg.Contracts.Amount = uint64(hostCount)
-	err = bus.UpdateAutopilotConfig(ctx, func(req *rapi.UpdateAutopilotRequest) {
-		enabled := true
-		req.Enabled = &enabled
-		req.Contracts = &autopilotCfg.Contracts
-		req.Contracts.Amount = uint64(hostCount)
-	})
+	err = bus.UpdateAutopilotConfig(ctx, client.WithAutopilotEnabled(true), client.WithContractsConfig(rapi.ContractsConfig{
+		Amount: uint64(hostCount),
+	}))
 	if err != nil {
 		return nil, fmt.Errorf("failed to update autopilot config: %w", err)
 	}
@@ -126,7 +124,7 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 	// wait for nodes to sync
 	time.Sleep(30 * time.Second) // TODO: be better
 
-	if _, err := autopilot.Trigger(true); err != nil {
+	if _, err := autopilot.Trigger(ctx, true); err != nil {
 		return nil, fmt.Errorf("failed to trigger autopilot: %w", err)
 	}
 
@@ -194,7 +192,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	defer bdb.Close()
 
 	n, genesis := benchmarkV1Network()
-	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis)
+	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis, nil)
 	if err != nil {
 		log.Panic("failed to create dbstore", zap.Error(err))
 	}
