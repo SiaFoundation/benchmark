@@ -5,20 +5,20 @@ go 1.23.2
 toolchain go1.24.2
 
 require (
-	github.com/chromedp/chromedp v0.13.0
-	github.com/go-echarts/go-echarts/v2 v2.5.1
+	github.com/chromedp/chromedp v0.13.6
+	github.com/go-echarts/go-echarts/v2 v2.5.3
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20250424121732-b0448b466f7f
-	go.sia.tech/core v0.11.0
-	go.sia.tech/coreutils v0.13.2-0.20250426003833-d0f994779b11
-	go.sia.tech/renterd/v2 v2.0.2-0.20250424125823-77006af3f5d0
+	go.sia.tech/core v0.12.0
+	go.sia.tech/coreutils v0.13.2
+	go.sia.tech/renterd/v2 v2.1.0-beta.1
 	go.uber.org/zap v1.27.0
 	lukechampine.com/frand v1.5.1
 )
 
 require (
 	github.com/aws/aws-sdk-go v1.55.7 // indirect
-	github.com/chromedp/cdproto v0.0.0-20250222051814-50c6cb17f10a // indirect
+	github.com/chromedp/cdproto v0.0.0-20250403032234-65de8f5d025b // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.115.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
@@ -50,8 +50,8 @@ require (
 	go.etcd.io/bbolt v1.4.0 // indirect
 	go.sia.tech/explored v0.0.0-20250424120217-70aa1374adfd // indirect
 	go.sia.tech/gofakes3 v0.0.5 // indirect
-	go.sia.tech/hostd/v2 v2.1.0-beta.4.0.20250424120304-711ac3eb1da0 // indirect
-	go.sia.tech/jape v0.13.0 // indirect
+	go.sia.tech/hostd/v2 v2.1.0-beta.4.0.20250429094021-8048e92a76dd // indirect
+	go.sia.tech/jape v0.13.1 // indirect
 	go.sia.tech/mux v1.4.0 // indirect
 	go.sia.tech/walletd/v2 v2.2.1 // indirect
 	go.uber.org/mock v0.5.0 // indirect
