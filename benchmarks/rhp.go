@@ -81,7 +81,7 @@ func setupRenterWallet(ctx context.Context, cm *chain.Manager, nm *nodes.Manager
 
 	// create a wallet for the renter
 	ws := testutil.NewEphemeralWalletStore()
-	sw, err := wallet.NewSingleAddressWallet(renterKey, cm, ws)
+	sw, err := wallet.NewSingleAddressWallet(renterKey, cm, ws, wallet.WithDefragThreshold(250))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create renter wallet: %w", err)
 	}
