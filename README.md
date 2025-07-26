@@ -20,6 +20,8 @@ The end-to-end benchmark is designed to test the performance of a renterd node. 
 
 ### RHP2
 
+**RHP2 is deprecated and no longer supported. The results are kept for historical purposes**
+
 The RHP2 benchmark is designed to test the performance of the RHP2 implementation in `hostd`. It forms a contract with a single host and tests the speed of uploading and downloading randomly generated sectors. The benchmark uploads and downloads 256 sectors, or 1GiB of data. To simulate production scenarios, the benchmark appends a single sector at a time instead of batching the appends into a single RPC. This will result in slightly slower speeds, but is more representative of how RHP2 is used in production.
 
 ![RHP2 Results](results/rhp2.png)
@@ -27,6 +29,8 @@ The RHP2 benchmark is designed to test the performance of the RHP2 implementatio
 [Results](results/rhp2.csv)
 
 ### RHP3
+
+**RHP3 is deprecated and no longer supported. The results are kept for historical purposes**
 
 The RHP3 benchmark is designed to test the performance of the RHP3 implementation in `hostd`. It forms a contract with a single host and tests the speed of uploading and downloading randomly generated sectors. The benchmark uploads and downloads 256 sectors, or 1GiB of data. To simulate production scenarios, the benchmark appends a single sector at a time instead of batching the appends into a single MDM program. This will result in slightly slower speeds, but is more representative of how RHP3 is used in production.
 
