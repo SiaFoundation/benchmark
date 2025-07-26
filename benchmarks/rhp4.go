@@ -27,6 +27,15 @@ import (
 	"lukechampine.com/frand"
 )
 
+type RHPResult struct {
+	Sectors         uint64        `json:"sectors"`
+	UploadTime      time.Duration `json:"uploadTime"`
+	DownloadTime    time.Duration `json:"downloadTime"`
+	AppendSectorP99 time.Duration `json:"appendSectorP99"`
+	ReadSectorP99   time.Duration `json:"readSectorP99"`
+	ReadSectorTTFB  time.Duration `json:"readSectorTTFB"`
+}
+
 type fundAndSign struct {
 	w  *wallet.SingleAddressWallet
 	pk types.PrivateKey
@@ -37,6 +46,10 @@ func (fs *fundAndSign) FundV2Transaction(txn *types.V2Transaction, amount types.
 }
 func (fs *fundAndSign) ReleaseInputs(txns []types.V2Transaction) {
 	fs.w.ReleaseInputs(nil, txns)
+}
+
+func (fs *fundAndSign) RecommendedFee() types.Currency {
+	return fs.w.RecommendedFee()
 }
 
 func (fs *fundAndSign) SignV2Inputs(txn *types.V2Transaction, toSign []int) {
@@ -50,6 +63,65 @@ func (fs *fundAndSign) PublicKey() types.PublicKey {
 }
 func (fs *fundAndSign) Address() types.Address {
 	return fs.w.Address()
+}
+
+// helper to scan the chain and update the wallet. Should only be used with a
+// local testnet.
+func scanWallet(ctx context.Context, cm *chain.Manager, sw *wallet.SingleAddressWallet, ss *testutil.EphemeralWalletStore) error {
+	var index types.ChainIndex
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		var done bool
+		err := ss.UpdateChainState(func(ux wallet.UpdateTx) error {
+			var applied []chain.ApplyUpdate
+			reverted, applied, err := cm.UpdatesSince(index, 1000)
+			if err != nil {
+				return fmt.Errorf("failed to get updates: %w", err)
+			} else if len(applied) == 0 && len(reverted) == 0 {
+				done = true
+				return nil
+			}
+
+			if len(applied) > 0 {
+				index = applied[len(applied)-1].State.Index
+			} else if len(reverted) > 0 {
+				index = reverted[len(reverted)-1].State.Index
+			}
+
+			return sw.UpdateChainState(ux, reverted, applied)
+		})
+		if err != nil {
+			return err
+		} else if done {
+			return nil
+		}
+	}
+}
+
+func setupRenterWallet(ctx context.Context, cm *chain.Manager, s *syncer.Syncer, nm *nodes.Manager, renterKey types.PrivateKey) (*wallet.SingleAddressWallet, error) {
+	// mine some utxos for the renter
+	renterAddr := types.StandardUnlockHash(renterKey.PublicKey())
+	if err := nm.MineBlocks(ctx, 20, renterAddr); err != nil {
+		return nil, fmt.Errorf("failed to mine blocks: %w", err)
+	}
+
+	// create a wallet for the renter
+	ws := testutil.NewEphemeralWalletStore()
+	sw, err := wallet.NewSingleAddressWallet(renterKey, cm, ws, s, wallet.WithDefragThreshold(250))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create renter wallet: %w", err)
+	}
+	defer sw.Close()
+
+	if err := scanWallet(ctx, cm, sw, ws); err != nil {
+		return nil, fmt.Errorf("failed to scan wallet: %w", err)
+	}
+	return sw, nil
 }
 
 // helper to get the last host announcement. Scans the whole chain. Should only
@@ -241,7 +313,7 @@ func RHP4(ctx context.Context, dir string, log *zap.Logger) (RHPResult, error) {
 	case <-ready:
 	}
 
-	rw, err := setupRenterWallet(ctx, cm, nm, renterKey)
+	rw, err := setupRenterWallet(ctx, cm, s, nm, renterKey)
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to setup benchmark: %w", err)
 	}
@@ -342,7 +414,7 @@ func RHP4QUIC(ctx context.Context, dir string, log *zap.Logger) (RHPResult, erro
 	case <-ready:
 	}
 
-	rw, err := setupRenterWallet(ctx, cm, nm, renterKey)
+	rw, err := setupRenterWallet(ctx, cm, s, nm, renterKey)
 	if err != nil {
 		return RHPResult{}, fmt.Errorf("failed to setup benchmark: %w", err)
 	}

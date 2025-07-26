@@ -17,12 +17,6 @@ func main() {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	if err := generateRHPBox(ctx, "RHP2", filepath.Join(resultsDir, "rhp2.csv"), filepath.Join(resultsDir, "rhp2.png")); err != nil {
-		panic(err)
-	}
-	if err := generateRHPBox(ctx, "RHP3", filepath.Join(resultsDir, "rhp3.csv"), filepath.Join(resultsDir, "rhp3.png")); err != nil {
-		panic(err)
-	}
 	if err := generateRHPBox(ctx, "RHP4 SiaMux", filepath.Join(resultsDir, "rhp4.csv"), filepath.Join(resultsDir, "rhp4.png")); err != nil {
 		panic(err)
 	}
