@@ -191,7 +191,7 @@ func E2E(ctx context.Context, dir string, log *zap.Logger) (E2EResult, error) {
 	}
 	defer bdb.Close()
 
-	n, genesis := benchmarkV1Network()
+	n, genesis := benchmarkV2Network()
 	dbstore, tipState, err := chain.NewDBStore(bdb, n, genesis, nil)
 	if err != nil {
 		log.Panic("failed to create dbstore", zap.Error(err))
