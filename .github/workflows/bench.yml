@@ -39,10 +39,6 @@ jobs:
           mkdir -p results
           CGO_ENABLED=1 go build -o bin/ -trimpath -a ./cmd/benchmark
           git reset --hard
-      - name: Run RHP2
-        run: ./bin/benchmark -rhp2 -output results
-      - name: Run RHP3
-        run: ./bin/benchmark -rhp3 -output results
       - name: Run RHP4 - SiaMux
         run: ./bin/benchmark -rhp4 -output results
       - name: Run RHP4 - QUIC
