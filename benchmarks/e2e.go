@@ -93,7 +93,9 @@ func setupE2EBenchmark(ctx context.Context, network *consensus.Network, nm *node
 	// set the contract count to match the number of hosts
 	autopilotCfg.Contracts.Amount = uint64(hostCount)
 	err = bus.UpdateAutopilotConfig(ctx, client.WithAutopilotEnabled(true), client.WithContractsConfig(rapi.ContractsConfig{
-		Amount: uint64(hostCount),
+		Period:      4320, // 30 days
+		RenewWindow: 288,  // 2 days
+		Amount:      uint64(hostCount),
 	}))
 	if err != nil {
 		return nil, fmt.Errorf("failed to update autopilot config: %w", err)
