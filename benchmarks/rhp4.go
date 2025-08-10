@@ -180,7 +180,7 @@ func runRHP4Benchmark(ctx context.Context, cm *chain.Manager, rw *wallet.SingleA
 	revision.Revision = fundResult.Revision
 
 	log.Info("starting upload")
-	at := accountID.Token(renterKey, hostKey.PublicKey())
+	at := proto4.NewAccountToken(renterKey, hostKey.PublicKey())
 	appendTimes := make([]time.Duration, benchmarkSectors)
 	roots := make([]types.Hash256, benchmarkSectors)
 	for i := range benchmarkSectors {
