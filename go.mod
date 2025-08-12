@@ -5,11 +5,11 @@ go 1.24.3
 toolchain go1.24.5
 
 require (
-	github.com/chromedp/chromedp v0.13.6
-	github.com/go-echarts/go-echarts/v2 v2.5.4
+	github.com/chromedp/chromedp v0.14.1
+	github.com/go-echarts/go-echarts/v2 v2.6.1
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.3-0.20250810203105-d76463bf3cea
-	go.sia.tech/core v0.16.0
+	go.sia.tech/core v0.17.0
 	go.sia.tech/coreutils v0.17.0
 	go.sia.tech/renterd/v2 v2.6.0-beta.1.0.20250806092212-cc789890c6e3
 	go.uber.org/zap v1.27.0
@@ -18,11 +18,11 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.55.8 // indirect
-	github.com/chromedp/cdproto v0.0.0-20250530212709-4dcc110a7b92 // indirect
+	github.com/chromedp/cdproto v0.0.0-20250724212937-08a3db8b4327 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.115.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
-	github.com/go-json-experiment/json v0.0.0-20250517221953-25912455fbc8 // indirect
+	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.4.0 // indirect
