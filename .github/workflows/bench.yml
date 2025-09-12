@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   benchmark:
-    runs-on: linux-benchmark
+    runs-on: tenki-standard-xlarge-plus-64c-256g
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
