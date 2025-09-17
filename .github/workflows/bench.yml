@@ -11,8 +11,8 @@ on:
         description: renterd commit hash or branch name to use
         required: false
         default: "master"
-  schedule:
-    - cron: "0 */3 * * *"
+#  schedule:
+#    - cron: "0 */3 * * *"
 
 permissions:
   contents: write
@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   benchmark:
+    timeout-minutes: 30
     runs-on: tenki-standard-xlarge-plus-64c-256g
     steps:
       - uses: actions/checkout@v4
