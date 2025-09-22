@@ -11,8 +11,8 @@ on:
         description: renterd commit hash or branch name to use
         required: false
         default: "master"
-#  schedule:
-#    - cron: "0 */3 * * *"
+  schedule:
+    - cron: "0 */3 * * *"
 
 permissions:
   contents: write
