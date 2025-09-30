@@ -646,3 +646,4 @@ Timestamp,OS,Arch,CPU,hostd Version,renterd Version,Upload Speed,Download Speed,
 2025-09-29T15:13:33Z,linux,amd64,AMD EPYC,v2.4.2-beta.1,v2.7.0,1055.6936 Mbps,818.4249 Mbps,65 ms
 2025-09-29T18:16:26Z,linux,amd64,AMD EPYC,v2.4.2-beta.1,v2.7.0,1066.8466 Mbps,616.4901 Mbps,80 ms
 2025-09-29T21:13:04Z,linux,amd64,AMD EPYC,v2.4.2-beta.1,v2.7.0,1169.1231 Mbps,718.8958 Mbps,88 ms
+2025-09-30T00:34:52Z,linux,amd64,AMD EPYC,v2.4.2-beta.1,v2.7.0,1069.8634 Mbps,551.6335 Mbps,97 ms
