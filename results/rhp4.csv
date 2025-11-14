@@ -1134,3 +1134,5 @@ Timestamp,OS,Arch,CPU,hostd Version,Upload Speed,Download Speed,Append Sector P9
 2025-11-13T00:37:27Z,linux,amd64,AMD EPYC,v2.5.1,684.0909 Mbps,954.6258 Mbps,70 ms,44 ms,7 ms
 2025-11-13T12:17:23Z,linux,amd64,AMD EPYC,v2.5.1,518.1545 Mbps,928.0996 Mbps,97 ms,49 ms,18 ms
 2025-11-13T12:18:04Z,linux,amd64,AMD EPYC,v2.5.1,647.5281 Mbps,935.7273 Mbps,73 ms,46 ms,8 ms
+2025-11-14T00:37:13Z,linux,amd64,AMD EPYC,v2.5.1,582.7812 Mbps,950.8291 Mbps,85 ms,53 ms,22 ms
+2025-11-14T00:37:52Z,linux,amd64,AMD EPYC,v2.5.1,709.7588 Mbps,965.5482 Mbps,66 ms,40 ms,9 ms
