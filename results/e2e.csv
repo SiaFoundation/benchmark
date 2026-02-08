@@ -840,3 +840,4 @@ Timestamp,OS,Arch,CPU,hostd Version,renterd Version,Upload Speed,Download Speed,
 2026-02-06T00:48:08Z,linux,amd64,AMD EPYC 7B13 64-Core Processor,v2.6.1-0.20260204193612-ab8b364ad3fe,v2.8.0,939.6550 Mbps,741.1198 Mbps,117 ms
 2026-02-06T12:26:14Z,linux,amd64,AMD EPYC 7B13 64-Core Processor,v2.6.1-0.20260204193612-ab8b364ad3fe,v2.8.0,857.2981 Mbps,634.9946 Mbps,94 ms
 2026-02-07T00:47:35Z,linux,amd64,AMD EPYC 7B13 64-Core Processor,v2.6.1-0.20260204193612-ab8b364ad3fe,v2.8.1,876.1871 Mbps,591.6350 Mbps,99 ms
+2026-02-08T12:21:47Z,linux,amd64,AMD EPYC 7B13 64-Core Processor,v2.6.1-0.20260204193612-ab8b364ad3fe,v2.8.1,881.5618 Mbps,596.5695 Mbps,84 ms
