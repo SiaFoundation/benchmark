@@ -21,6 +21,7 @@ require (
 	github.com/chromedp/cdproto v0.0.0-20250724212937-08a3db8b4327 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.116.0 // indirect
+	github.com/dunglas/httpsfv v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
@@ -39,8 +40,8 @@ require (
 	github.com/oschwald/geoip2-golang v1.13.0 // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/quic-go/quic-go v0.57.1 // indirect
-	github.com/quic-go/webtransport-go v0.9.0 // indirect
+	github.com/quic-go/quic-go v0.59.0 // indirect
+	github.com/quic-go/webtransport-go v0.10.0 // indirect
 	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
 	github.com/shabbyrobe/gocovmerge v0.0.0-20230507112040-c3350d9342df // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
