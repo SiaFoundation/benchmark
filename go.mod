@@ -6,7 +6,7 @@ toolchain go1.24.5
 
 require (
 	github.com/chromedp/chromedp v0.14.2
-	github.com/go-echarts/go-echarts/v2 v2.6.7
+	github.com/go-echarts/go-echarts/v2 v2.7.0
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.5
 	go.sia.tech/core v0.19.1-0.20251215141429-887336e35dd9

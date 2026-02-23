@@ -17,8 +17,8 @@ github.com/dunglas/httpsfv v1.1.0 h1:Jw76nAyKWKZKFrpMMcL76y35tOpYHqQPzHQiwDvpe54
 github.com/dunglas/httpsfv v1.1.0/go.mod h1:zID2mqw9mFsnt7YC3vYQ9/cjq30q41W+1AnDwH8TiMg=
 github.com/gabriel-vasile/mimetype v1.4.13 h1:46nXokslUBsAJE/wMsp5gtO500a4F3Nkz9Ufpk2AcUM=
 github.com/gabriel-vasile/mimetype v1.4.13/go.mod h1:d+9Oxyo1wTzWdyVUPMmXFvp4F9tea18J8ufA774AB3s=
-github.com/go-echarts/go-echarts/v2 v2.6.7 h1:J9Y6/vVn06BBSGeoowPbdUWsxzHktwqF1uwOuSEUyTY=
-github.com/go-echarts/go-echarts/v2 v2.6.7/go.mod h1:Z+spPygZRIEyqod69r0WMnkN5RV3MwhYDtw601w3G8w=
+github.com/go-echarts/go-echarts/v2 v2.7.0 h1:PQqs3jpTEroMKgxEALPKBNFTO2Ms9By11gVOKh8+stI=
+github.com/go-echarts/go-echarts/v2 v2.7.0/go.mod h1:Z+spPygZRIEyqod69r0WMnkN5RV3MwhYDtw601w3G8w=
 github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 h1:iizUGZ9pEquQS5jTGkh4AqeeHCMbfbjeb0zMt0aEFzs=
 github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2/go.mod h1:TiCD2a1pcmjd7YnhGH0f/zKNcCD06B029pHhzV23c2M=
 github.com/go-sql-driver/mysql v1.9.3 h1:U/N249h2WzJ3Ukj8SowVFjdtZKfu9vlLZxjPXV1aweo=
