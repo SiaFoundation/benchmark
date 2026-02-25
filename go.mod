@@ -8,7 +8,7 @@ require (
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.5
 	go.sia.tech/core v0.19.1-0.20251215141429-887336e35dd9
-	go.sia.tech/coreutils v0.21.0
+	go.sia.tech/coreutils v0.21.1
 	go.sia.tech/renterd/v2 v2.8.1
 	go.uber.org/zap v1.27.1
 	lukechampine.com/frand v1.5.1
@@ -51,12 +51,12 @@ require (
 	go.sia.tech/mux v1.4.0 // indirect
 	go.sia.tech/walletd/v2 v2.12.0-beta.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476 // indirect
-	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/net v0.49.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	golang.org/x/tools v0.40.0 // indirect
+	golang.org/x/tools v0.41.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
