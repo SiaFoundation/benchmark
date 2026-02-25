@@ -1,8 +1,6 @@
 module go.sia.tech/benchmark
 
-go 1.24.3
-
-toolchain go1.24.5
+go 1.26.0
 
 require (
 	github.com/chromedp/chromedp v0.14.2
