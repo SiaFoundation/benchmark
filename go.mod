@@ -4,12 +4,12 @@ go 1.26.0
 
 require (
 	github.com/chromedp/chromedp v0.14.2
-	github.com/go-echarts/go-echarts/v2 v2.6.7
+	github.com/go-echarts/go-echarts/v2 v2.7.0
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.5
 	go.sia.tech/core v0.19.1-0.20251215141429-887336e35dd9
 	go.sia.tech/coreutils v0.21.1
-	go.sia.tech/renterd/v2 v2.8.1
+	go.sia.tech/renterd/v2 v2.9.0
 	go.uber.org/zap v1.27.1
 	lukechampine.com/frand v1.5.1
 )
@@ -32,8 +32,8 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
-	github.com/klauspost/reedsolomon v1.13.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.33 // indirect
+	github.com/klauspost/reedsolomon v1.13.2 // indirect
+	github.com/mattn/go-sqlite3 v1.14.34 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/oschwald/geoip2-golang v1.13.0 // indirect
 	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
