@@ -3,8 +3,8 @@ module go.sia.tech/benchmark
 go 1.26.0
 
 require (
-	github.com/chromedp/chromedp v0.14.2
-	github.com/go-echarts/go-echarts/v2 v2.7.0
+	github.com/chromedp/chromedp v0.15.0
+	github.com/go-echarts/go-echarts/v2 v2.7.1
 	github.com/klauspost/cpuid v1.3.1
 	go.sia.tech/cluster v0.1.5
 	go.sia.tech/core v0.19.1-0.20251215141429-887336e35dd9
@@ -16,12 +16,12 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.55.8 // indirect
-	github.com/chromedp/cdproto v0.0.0-20250724212937-08a3db8b4327 // indirect
+	github.com/chromedp/cdproto v0.0.0-20260320225252-cf654f46fc63 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.116.0 // indirect
 	github.com/dunglas/httpsfv v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
-	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect
+	github.com/go-json-experiment/json v0.0.0-20260214004413-d219187c3433 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.4.0 // indirect
@@ -54,7 +54,7 @@ require (
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476 // indirect
 	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
