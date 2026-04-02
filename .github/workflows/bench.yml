@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 30
     runs-on: tenki-standard-xlarge-plus-64c-256g
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version: stable
