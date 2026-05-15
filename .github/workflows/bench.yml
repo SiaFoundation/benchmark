@@ -23,8 +23,8 @@ jobs:
     timeout-minutes: 30
     runs-on: tenki-standard-xlarge-plus-64c-256g
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version: stable
       - name: Prepare
@@ -50,7 +50,7 @@ jobs:
         continue-on-error: true # chromedp is unreliable in CI
         run: go run ./cmd/chart -dir results
       - name: Add Results
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
         id: result
         with:
           delete-branch: true
