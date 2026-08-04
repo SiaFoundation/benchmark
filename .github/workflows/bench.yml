@@ -11,8 +11,6 @@ on:
         description: renterd commit hash or branch name to use
         required: false
         default: "master"
-  schedule:
-    - cron: "0 */24 * * *"
 
 permissions:
   contents: write
@@ -21,7 +19,7 @@ permissions:
 jobs:
   benchmark:
     timeout-minutes: 30
-    runs-on: tenki-standard-xlarge-plus-64c-256g
+    runs-on: tenki-standard-medium-4c-8g
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
